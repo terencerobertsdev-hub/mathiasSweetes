@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --purple-900: #351060;
+  --purple-700: #5b21b6;
+  --purple-500: #7c3aed;
+  --yellow: #ffd84d;
+  --aqua: #62dfdc;
+  --white: #fffdf8;
+  --ink: #22142d;
+  --muted: #665b6d;
+  --surface: #f7f2ff;
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--white); color: var(--ink); font-family: var(--font-body); line-height: 1.6; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 4px solid var(--aqua); outline-offset: 4px; }
+::selection { background: var(--yellow); color: var(--purple-900); }
