@@ -9,7 +9,7 @@
     <a href="#treats">Treats</a>
     <a href="#story">Our story</a>
     <a href="#reviews">Reviews</a>
-    <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Order on WhatsApp</a>
+    <button class="nav-order" type="button" disabled>WhatsApp paused</button>
   </nav>
 </header>
 
@@ -20,12 +20,12 @@
       <h1>Sweet treats.<br /><span>Big smiles.</span></h1>
       <p class="hero-lead">Colorful cakesicles, cake pops, and treats made with care for celebrations, pop-ups, or just because.</p>
       <div class="hero-actions">
-        <a class="button button-primary" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
-          <span aria-hidden="true">💬</span> Start an order
+        <a class="button button-primary" href="#order-form">
+          <span aria-hidden="true">✉</span> Request an order
         </a>
         <a class="button button-secondary" href="#treats">See our treats</a>
       </div>
-      <p class="quick-note">Direct, friendly ordering through WhatsApp · (470) 721-2700</p>
+      <p class="quick-note">Requests go privately to a parent-managed inbox · WhatsApp is temporarily unavailable.</p>
     </div>
     <div class="hero-visual">
       <div class="hero-burst" aria-hidden="true"></div>
@@ -85,23 +85,66 @@
       </div>
     </div>
     <ol class="steps">
-      <li><span>1</span><h3>Message us</h3><p>Start a WhatsApp chat and tell us what you have in mind.</p></li>
+      <li><span>1</span><h3>Send a request</h3><p>Use the private form below to tell a parent or guardian what you have in mind.</p></li>
       <li><span>2</span><h3>Choose the details</h3><p>We’ll talk through quantity, colors, occasion, and timing.</p></li>
       <li><span>3</span><h3>Enjoy the smiles</h3><p>Confirm your order, then get ready for a seriously sweet moment.</p></li>
     </ol>
-    <div class="center-action"><a class="button button-primary" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a></div>
+    <div class="center-action"><a class="button button-primary" href="#order-form">Request an order by email</a></div>
+  </section>
+
+  <section class="order-form-section section" id="order-form" aria-labelledby="order-form-heading">
+    <div class="order-form-copy">
+      <p class="eyebrow">Adult-managed ordering</p>
+      <h2 id="order-form-heading">Tell us what you’d like</h2>
+      <p>Your request goes privately to Mathias’s parent or guardian. They will handle every reply, order detail, and pickup arrangement.</p>
+      <div class="minor-safety-note">
+        <strong>Protecting our young baker</strong>
+        <p>Please do not submit information about a child, payment details, or a home address. An adult will confirm safe pickup details after reviewing your request.</p>
+      </div>
+    </div>
+
+    <form class="order-form" (submit)="submitOrder($event)" aria-describedby="order-form-privacy">
+      <input type="hidden" name="_subject" value="Mathias Treats order inquiry" />
+      <input type="hidden" name="source" value="Mathias Treats website" />
+      <div class="honeypot" aria-hidden="true">
+        <label for="company-website">Leave this field empty</label>
+        <input id="company-website" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <label for="customer-name">Your name</label>
+      <input id="customer-name" name="name" type="text" autocomplete="name" required maxlength="80" />
+
+      <label for="customer-email">Your email</label>
+      <input id="customer-email" name="email" type="email" autocomplete="email" required maxlength="254" />
+
+      <label for="requested-date">When do you need the treats? <span>(optional)</span></label>
+      <input id="requested-date" name="requestedDate" type="date" />
+
+      <label for="order-details">What would you like?</label>
+      <textarea id="order-details" name="orderDetails" rows="6" required minlength="10" maxlength="1500" placeholder="Tell us the treat type, quantity, colors, occasion, and timing."></textarea>
+
+      <p id="order-form-privacy" class="form-privacy">This form is monitored by an adult. Your information is used only to respond to this order request.</p>
+      <button class="button button-primary" type="submit" [disabled]="orderStatus() === 'sending'">
+        {{ orderStatus() === 'sending' ? 'Sending…' : 'Send order request' }}
+      </button>
+
+      @if (orderMessage()) {
+        <p class="form-status" [class.form-status-error]="orderStatus() === 'error'" role="status">{{ orderMessage() }}</p>
+      }
+    </form>
   </section>
 
   <section class="reviews section" id="reviews">
     <div class="reviews-copy">
-      <p class="eyebrow">Real words from happy customers</p>
-      <h2>The treats speak for themselves</h2>
-      <blockquote>“The support and encouragement meant so much to us. We helped make his first little business adventure so special.”</blockquote>
+      <p class="eyebrow">Made possible by a caring community</p>
+      <h2>A sweet beginning worth celebrating</h2>
+      <blockquote>Kind words and encouragement helped make Mathias’s first little business adventure truly special.</blockquote>
       <p class="review-context">The community showed up for Mathias—sharing encouragement, trying the treats, and making his first stand a day to remember.</p>
     </div>
-    <div class="review-screenshots" aria-label="Customer review screenshots">
-      <figure><img src="assets/reviews/customer-comments.jpg" alt="Screenshot of positive customer comments about Mathias and his treats" loading="lazy" /><figcaption>Community encouragement</figcaption></figure>
-      <figure><img src="assets/reviews/customer-story.jpg" alt="Screenshot describing customer support for Mathias Treats' first business event" loading="lazy" /><figcaption>A special first pop-up</figcaption></figure>
+    <div class="review-highlight" aria-hidden="true">
+      <span>Sweet</span>
+      <strong>support</strong>
+      <span>from day one</span>
     </div>
   </section>
 
@@ -121,17 +164,17 @@
   <section class="final-cta">
     <img src="assets/brand/mathias-treats-logo.jpg" alt="Mathias Treats cakesicles, cake pops, and treats" width="180" height="180" loading="lazy" />
     <div><p class="eyebrow">Ready for something sweet?</p><h2>Let’s make your treat idea happen.</h2></div>
-    <a class="button button-yellow" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Message Mathias Treats</a>
+    <a class="button button-yellow" href="#order-form">Request an order</a>
   </section>
 </main>
 
 <footer>
   <a class="footer-brand" href="#top">Mathias Treats</a>
   <p>Cakesicles · Cake pops · Treats</p>
-  <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>
+  <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><span class="disabled-contact">WhatsApp paused</span></div>
   <small>© {{ currentYear }} Mathias Treats. Handmade with joy.</small>
 </footer>
 
-<a class="whatsapp-float" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" aria-label="Chat with Mathias Treats on WhatsApp">
-  <span aria-hidden="true">💬</span><span>Order on WhatsApp</span>
-</a>
+<button class="whatsapp-float" type="button" disabled aria-label="WhatsApp ordering is temporarily unavailable">
+  <span aria-hidden="true">💬</span><span>WhatsApp paused</span>
+</button>
