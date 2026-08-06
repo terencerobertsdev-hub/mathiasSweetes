@@ -16,7 +16,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: #eee8f5; color: var(--ink); font-family: var(--font-body); line-height: 1.6; }
+body { margin: 0; padding-bottom: 1rem; background: #eee8f5; color: var(--ink); font-family: var(--font-body); line-height: 1.6; }
 img { display: block; max-width: 100%; }
 a { color: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
