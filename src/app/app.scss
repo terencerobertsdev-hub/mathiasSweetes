@@ -68,6 +68,13 @@ h1 span::after { content: ''; position: absolute; left: 1%; right: 0; bottom: .1
 .minor-safety-note { margin-top: 2rem; padding: 1.25rem; border-left: 5px solid var(--aqua); border-radius: .75rem; background: #fff; }
 .minor-safety-note strong { color: var(--purple-900); }
 .minor-safety-note p { margin: .45rem 0 0; color: var(--muted); }
+.fawaii-support { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; padding: .85rem 1rem; border: 2px solid #d8cde6; border-radius: 1rem; background: #fff; color: var(--purple-900); text-decoration: none; transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.fawaii-support:hover { border-color: var(--purple-500); box-shadow: 0 8px 24px rgba(53,16,96,.12); transform: translateY(-2px); }
+.fawaii-support img { width: 76px; height: 76px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
+.fawaii-support > span { display: grid; line-height: 1.25; }
+.fawaii-support small { color: var(--muted); font-weight: 700; }
+.fawaii-support strong { margin-block: .2rem; font: 800 1.15rem var(--font-display); }
+.fawaii-support > span > span { color: var(--purple-700); font-size: .85rem; font-weight: 800; }
 .order-form { position: relative; display: grid; gap: .6rem; padding: clamp(1.25rem, 4vw, 2.5rem); border-radius: 1.5rem; background: #fff; box-shadow: 0 16px 45px rgba(53,16,96,.12); }
 .order-form label { margin-top: .55rem; color: var(--purple-900); font-weight: 800; }
 .order-form label span { color: var(--muted); font-weight: 600; }

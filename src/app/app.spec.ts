@@ -18,6 +18,8 @@ describe('Mathias Treats site', () => {
     expect(element.querySelector('form#order-form')).toBeNull();
     expect(element.querySelector('section#order-form form')).not.toBeNull();
     expect(element.textContent).toContain('parent or guardian');
+    expect(element.querySelector('a[href="https://fawaii-custom-cookies.com/"]')).not.toBeNull();
+    expect(element.querySelector('.fawaii-support img')?.getAttribute('alt')).toBe('Fawaii logo');
   });
 
   it('provides useful alternative text for displayed content images', () => {
