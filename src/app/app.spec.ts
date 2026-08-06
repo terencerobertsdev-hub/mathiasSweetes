@@ -14,7 +14,7 @@ describe('Mathias Treats site', () => {
     expect(element.querySelector('h1')?.textContent).toContain('Sweet treats');
     expect(element.querySelectorAll('a[href^="https://wa.me/16783573948"]').length).toBeGreaterThan(0);
     expect(element.querySelectorAll('a').length).toBeGreaterThan(0);
-    expect(element.textContent).toContain('Message Mom');
+    expect(element.textContent).toContain('Make a Request');
     expect(element.querySelector('form#order-form')).toBeNull();
     expect(element.querySelector('section#order-form form')).not.toBeNull();
     expect(element.textContent).toContain('parent or guardian');
