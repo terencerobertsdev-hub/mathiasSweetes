@@ -21,7 +21,7 @@ h1 span::after { content: ''; position: absolute; left: 1%; right: 0; bottom: .1
 .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
 .button { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .8rem 1.3rem; border: 2px solid var(--purple-700); border-radius: 999px; text-decoration: none; font-weight: 800; transition: transform .18s ease, box-shadow .18s ease; }
 .button:not(:disabled):hover { transform: translateY(-3px); }
-.button:disabled, .nav-order:disabled, .whatsapp-float:disabled { cursor: not-allowed; opacity: .72; }
+.button:disabled { cursor: not-allowed; opacity: .72; }
 .button-primary { background: var(--purple-700); color: #fff; box-shadow: 0 6px 0 var(--purple-900); }
 .button-secondary { background: #fff; color: var(--purple-700); box-shadow: 0 6px 0 rgba(91,33,182,.16); }
 .button-yellow { background: var(--yellow); border-color: var(--yellow); color: var(--purple-900); box-shadow: 0 6px 0 #d49d00; }
@@ -100,7 +100,6 @@ footer { display: grid; grid-template-columns: 1fr auto auto; align-items: cente
 footer p { color: #d9cfe4; }
 footer div { display: flex; gap: 1.25rem; }
 footer div a { font-weight: 700; }
-.disabled-contact { color: #b9a9c8; font-weight: 700; }
 footer small { grid-column: 1/-1; color: #b9a9c8; }
 .whatsapp-float { position: fixed; right: max(1rem, calc((100vw - 82rem) / 2 + 1rem)); bottom: 1.2rem; z-index: 50; display: flex; align-items: center; gap: .55rem; padding: .78rem 1rem; border: 0; border-radius: 999px; background: #146c3a; color: #fff; text-decoration: none; font: 800 1rem/1.2 inherit; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 

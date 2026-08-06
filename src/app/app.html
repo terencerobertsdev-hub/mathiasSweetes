@@ -9,7 +9,7 @@
     <a href="#treats">Treats</a>
     <a href="#story">Our story</a>
     <a href="#reviews">Reviews</a>
-    <button class="nav-order" type="button" disabled>WhatsApp paused</button>
+    <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Parent-managed WhatsApp</a>
   </nav>
 </header>
 
@@ -25,7 +25,7 @@
         </a>
         <a class="button button-secondary" href="#treats">See our treats</a>
       </div>
-      <p class="quick-note">Requests go privately to a parent-managed inbox · WhatsApp is temporarily unavailable.</p>
+      <p class="quick-note">Requests go privately to a parent-managed inbox or Fawaii’s adult-managed WhatsApp.</p>
     </div>
     <div class="hero-visual">
       <div class="hero-burst" aria-hidden="true"></div>
@@ -171,10 +171,10 @@
 <footer>
   <a class="footer-brand" href="#top">Mathias Treats</a>
   <p>Cakesicles · Cake pops · Treats</p>
-  <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><span class="disabled-contact">WhatsApp paused</span></div>
+  <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Parent-managed WhatsApp</a></div>
   <small>© {{ currentYear }} Mathias Treats. Handmade with joy.</small>
 </footer>
 
-<button class="whatsapp-float" type="button" disabled aria-label="WhatsApp ordering is temporarily unavailable">
-  <span aria-hidden="true">💬</span><span>WhatsApp paused</span>
-</button>
+<a class="whatsapp-float" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" aria-label="Message Mathias Treats parent or guardian on WhatsApp">
+  <span aria-hidden="true">💬</span><span>Message a parent</span>
+</a>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { GALLERY_ITEMS, INSTAGRAM_URL } from './site-content';
+import { GALLERY_ITEMS, INSTAGRAM_URL, WHATSAPP_URL } from './site-content';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +12,7 @@ export class App {
 
   protected readonly galleryItems = GALLERY_ITEMS;
   protected readonly instagramUrl = INSTAGRAM_URL;
+  protected readonly whatsappUrl = WHATSAPP_URL;
   protected readonly currentYear = new Date().getFullYear();
   protected readonly orderStatus = signal<'idle' | 'sending' | 'success' | 'error'>('idle');
   protected readonly orderMessage = signal('');

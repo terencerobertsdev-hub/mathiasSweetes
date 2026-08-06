@@ -1,3 +1,4 @@
+export const WHATSAPP_URL = 'https://wa.me/16783573948?text=Hi%20Fawaii!%20I%27d%20like%20to%20ask%20a%20parent%20about%20ordering%20from%20Mathias%20Treats.';
 export const INSTAGRAM_URL = 'https://www.instagram.com/mathistreats/';
 
 export interface GalleryItem { src: string; alt: string; label: string; }
