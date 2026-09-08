@@ -1,27 +1,34 @@
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
 <header class="site-header">
-  <a class="brand" href="#top" aria-label="Mathias Treats home">
+  <a class="brand" href="/" aria-label="Mathias Treats home">
     <img src="assets/brand/mathias-treats-logo.jpg" alt="" width="60" height="60" />
     <span>Mathias Treats</span>
   </a>
   <nav aria-label="Main navigation">
-    <a href="#treats">Treats</a>
-    <a href="#story">Our story</a>
-    <a href="#reviews">Reviews</a>
-    <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Make a Request</a>
+    <a href="/#treats">Treats</a>
+    <a href="/shop">Place an order</a>
+    <a href="/admin">Admin</a>
+    <a href="/#story">Our story</a>
+    <a href="/#reviews">Reviews</a>
+    <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a>
   </nav>
 </header>
 
 <main id="main-content">
+  @if (isAdminPage) {
+    <app-admin />
+  } @else if (isShopPage) {
+    <app-point-of-sale />
+  } @else {
   <section class="hero" id="top">
     <div class="hero-copy">
       <p class="eyebrow">Handmade joy on a stick</p>
       <h1>Sweet treats.<br /><span>Big smiles.</span></h1>
       <p class="hero-lead">Colorful cakesicles, cake pops, and treats made with care for celebrations, pop-ups, or just because.</p>
       <div class="hero-actions">
-        <a class="button button-primary" href="#order-form">
-          <span aria-hidden="true">✉</span> Request an order
+        <a class="button button-primary" href="/shop">
+          <span aria-hidden="true">🛍️</span> Shop treats
         </a>
         <a class="button button-secondary" href="#treats">See our treats</a>
       </div>
@@ -75,21 +82,6 @@
       </div>
       <a class="text-link" [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Follow the journey on Instagram <span aria-hidden="true">→</span></a>
     </div>
-  </section>
-
-  <section class="how-it-works section" aria-labelledby="order-heading">
-    <div class="section-heading centered">
-      <div>
-        <p class="eyebrow">Simple from hello to pickup</p>
-        <h2 id="order-heading">How to order</h2>
-      </div>
-    </div>
-    <ol class="steps">
-      <li><span>1</span><h3>Send a request</h3><p>Use the private form below to tell a parent or guardian what you have in mind.</p></li>
-      <li><span>2</span><h3>Choose the details</h3><p>We’ll talk through quantity, colors, occasion, and timing.</p></li>
-      <li><span>3</span><h3>Enjoy the smiles</h3><p>Confirm your order, then get ready for a seriously sweet moment.</p></li>
-    </ol>
-    <div class="center-action"><a class="button button-primary" href="#order-form">Request an order by email</a></div>
   </section>
 
   <section class="order-form-section section" id="order-form" aria-labelledby="order-form-heading">
@@ -174,15 +166,16 @@
     <div><p class="eyebrow">Ready for something sweet?</p><h2>Let’s make your treat idea happen.</h2></div>
     <a class="button button-yellow" href="#order-form">Request an order</a>
   </section>
+  }
 </main>
 
 <footer>
-  <a class="footer-brand" href="#top">Mathias Treats</a>
+  <a class="footer-brand" href="/">Mathias Treats</a>
   <p>Cakesicles · Cake pops · Treats</p>
-  <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">Make a Request</a></div>
+  <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>
   <small>© {{ currentYear }} Mathias Treats. Handmade with joy.</small>
 </footer>
 
-<a class="whatsapp-float" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" aria-label="Make a request through Mathias Treats parent-managed WhatsApp">
-  <span aria-hidden="true">💬</span><span>Make a Request</span>
+<a class="whatsapp-float" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" aria-label="Contact Mathias Treats through parent-managed WhatsApp">
+  <span aria-hidden="true">💬</span><span>WhatsApp</span>
 </a>

@@ -1,15 +1,22 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { PointOfSale } from './pos/point-of-sale';
+import { Admin } from './admin/admin';
 import { GALLERY_ITEMS, INSTAGRAM_URL, WHATSAPP_URL } from './site-content';
 
 @Component({
   selector: 'app-root',
+  imports: [Admin, PointOfSale],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
   private readonly orderEndpoint = 'https://formspree.io/f/mykovkdg';
+  private readonly document = inject(DOCUMENT);
 
+  protected readonly isShopPage = this.document.location.pathname === '/shop';
+  protected readonly isAdminPage = this.document.location.pathname === '/admin';
   protected readonly galleryItems = GALLERY_ITEMS;
   protected readonly instagramUrl = INSTAGRAM_URL;
   protected readonly whatsappUrl = WHATSAPP_URL;

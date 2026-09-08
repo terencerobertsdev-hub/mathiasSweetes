@@ -8,7 +8,7 @@
 nav { display: flex; align-items: center; gap: clamp(.9rem, 2.5vw, 2.25rem); }
 nav a { text-decoration: none; font-weight: 700; font-size: .92rem; }
 nav a:not(.nav-order):hover { color: var(--purple-500); }
-.nav-order { background: var(--purple-700); color: #fff; padding: .72rem 1rem; border: 0; border-radius: 999px; box-shadow: 0 5px 0 var(--purple-900); font: inherit; }
+.nav-order { background: #25d366; color: #102a1b; padding: .72rem 1rem; border: 0; border-radius: 999px; box-shadow: 0 5px 0 #087d3e; font: inherit; }
 .hero { min-height: 680px; display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: clamp(2rem, 6vw, 6rem); padding: clamp(4rem, 8vw, 7.5rem) clamp(1rem, 7vw, 7rem); background: radial-gradient(circle at 10% 20%, rgba(98,223,220,.23), transparent 25%), linear-gradient(135deg, #fffdf8 15%, #f6efff 100%); position: relative; }
 .hero::after { content: ''; position: absolute; right: -120px; bottom: -140px; width: 380px; height: 380px; border: 55px solid rgba(255,216,77,.35); border-radius: 50%; }
 .eyebrow { margin: 0 0 .75rem; color: var(--purple-700); font-size: .78rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
@@ -54,14 +54,6 @@ h1 span::after { content: ''; position: absolute; left: 1%; right: 0; bottom: .1
 .story-points strong { display: block; color: var(--purple-500); font: 800 1.5rem var(--font-display); }
 .story-points span { font-size: .83rem; font-weight: 700; }
 .text-link { color: var(--purple-700); font-weight: 800; text-underline-offset: .3em; }
-.how-it-works { background: var(--aqua); }
-.centered { justify-content: center; text-align: center; }
-.steps { max-width: 1100px; margin: 0 auto 2.5rem; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
-.steps li { background: #fff; border-radius: 1.5rem; padding: 2rem; text-align: center; box-shadow: 0 8px 0 rgba(53,16,96,.13); }
-.steps li > span { width: 52px; height: 52px; margin: 0 auto 1rem; display: grid; place-items: center; border-radius: 50%; background: var(--yellow); color: var(--purple-900); font: 800 1.5rem var(--font-display); }
-.steps h3 { color: var(--purple-900); font-size: 1.6rem; margin-bottom: .65rem; }
-.steps p { color: var(--muted); margin: 0; font-size: .92rem; }
-.center-action { text-align: center; }
 .order-form-section { display: grid; grid-template-columns: .9fr 1.1fr; align-items: start; gap: clamp(3rem, 7vw, 7rem); background: var(--surface); }
 .order-form-copy h2 { font-size: clamp(2.7rem, 5vw, 4.7rem); color: var(--purple-900); letter-spacing: -.035em; }
 .order-form-copy > p { color: var(--muted); font-size: 1.05rem; }
@@ -108,7 +100,7 @@ footer p { color: #d9cfe4; }
 footer div { display: flex; gap: 1.25rem; }
 footer div a { font-weight: 700; }
 footer small { grid-column: 1/-1; color: #b9a9c8; }
-.whatsapp-float { position: fixed; right: max(1rem, calc((100vw - 82rem) / 2 + 1rem)); bottom: 1.2rem; z-index: 50; display: flex; align-items: center; gap: .55rem; padding: .78rem 1rem; border: 0; border-radius: 999px; background: #146c3a; color: #fff; text-decoration: none; font: 800 1rem/1.2 inherit; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.whatsapp-float { position: fixed; right: max(1rem, calc((100vw - 82rem) / 2 + 1rem)); bottom: 1.2rem; z-index: 50; display: flex; align-items: center; gap: .55rem; padding: .78rem 1rem; border: 0; border-radius: 999px; background: #25d366; color: #102a1b; text-decoration: none; font: 800 1rem/1.2 inherit; box-shadow: 0 6px 0 #087d3e, 0 10px 30px rgba(0,0,0,.2); }
 
 @media (max-width: 900px) {
   nav a:not(.nav-order) { display: none; }
@@ -138,7 +130,6 @@ footer small { grid-column: 1/-1; color: #b9a9c8; }
   .treat-card-featured { grid-column: span 1; }
   .story-points { grid-template-columns: 1fr; }
   .story-points div { display: flex; align-items: center; gap: 1rem; }
-  .steps { grid-template-columns: 1fr; }
   .review-highlight { width: min(82vw, 360px); border-width: 8px; box-shadow: 12px 12px 0 var(--aqua); }
   .pop-up-images img { height: 340px; }
   .final-cta img { width: 135px; height: 135px; }

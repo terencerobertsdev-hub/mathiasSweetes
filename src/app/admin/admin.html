@@ -1,0 +1,111 @@
+<section class="admin-page" aria-labelledby="admin-heading">
+  <header class="admin-heading">
+    <div>
+      <p class="eyebrow">Catalog manager</p>
+      <h1 id="admin-heading">Product admin</h1>
+      <p>Add, edit, or remove the cards shown on the Place an order page.</p>
+    </div>
+    <a class="view-shop" href="/shop">View the shop <span aria-hidden="true">→</span></a>
+  </header>
+
+  @if (!signedIn()) {
+    <form #signInForm class="product-editor" (submit)="signIn($event)">
+      <p class="eyebrow">Authorized staff only</p>
+      <h2>Sign in</h2>
+      <label for="admin-email">Email</label>
+      <input id="admin-email" name="email" type="email" autocomplete="username" required />
+      <label for="admin-password">Password</label>
+      <input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="8" />
+      <button class="save-button" type="submit">Sign in securely</button>
+      <button class="text-button" type="button" (click)="requestPasswordReset(signInForm)">Forgot or change password</button>
+      @if (message()) { <p class="admin-message" role="status">{{ message() }}</p> }
+    </form>
+  } @else {
+  @if (recoveryMode()) {
+    <form class="product-editor" (submit)="updatePassword($event)">
+      <p class="eyebrow">Account security</p>
+      <h2>Choose a new password</h2>
+      <label for="new-admin-password">New password</label>
+      <input id="new-admin-password" name="newPassword" type="password" autocomplete="new-password" required minlength="12" />
+      <button class="save-button" type="submit">Update password</button>
+      @if (message()) { <p class="admin-message" role="status">{{ message() }}</p> }
+    </form>
+  } @else {
+  <div class="admin-notice" role="note">
+    <strong>Connected to Canton Digital Works SQL</strong>
+    <button class="text-button" type="button" (click)="signOut()">Sign out</button>
+  </div>
+
+  <div class="admin-layout">
+    <form id="product-editor" class="product-editor" (submit)="saveProduct($event)">
+      <div class="editor-title">
+        <div>
+          <p class="eyebrow">{{ editingId() ? 'Editing product' : 'New product' }}</p>
+          <h2>{{ editingId() ? 'Update card' : 'Add a card' }}</h2>
+        </div>
+        @if (editingId()) {
+          <button class="text-button" type="button" (click)="cancelEdit()">Cancel</button>
+        }
+      </div>
+
+      <label for="admin-title">Product title</label>
+      <input id="admin-title" name="title" type="text" required maxlength="80" />
+
+      <label for="admin-description">Description</label>
+      <textarea id="admin-description" name="description" rows="4" required minlength="10" maxlength="300"></textarea>
+
+      <div class="field-row">
+        <div>
+          <label for="admin-price">Price</label>
+          <div class="price-field"><span aria-hidden="true">$</span><input id="admin-price" name="price" type="number" required min="0.01" max="999.99" step="0.01" /></div>
+        </div>
+        <div>
+          <label for="admin-category">Category</label>
+          <input id="admin-category" name="category" type="text" required maxlength="40" />
+        </div>
+      </div>
+
+      <label for="admin-image">Card picture {{ editingId() ? '(choose only to replace)' : '' }}</label>
+      <input id="admin-image" class="file-input" name="image" type="file" accept="image/png,image/jpeg,image/webp" (change)="previewImage($event)" />
+
+      <label for="admin-image-alt">Picture description</label>
+      <input id="admin-image-alt" name="imageAlt" type="text" required maxlength="140" placeholder="Describe what is visible in the picture" />
+
+      @if (imagePreview()) {
+        <img class="image-preview" [src]="imagePreview()" alt="Preview of the selected product picture" />
+      }
+
+      <button class="save-button" type="submit">{{ editingId() ? 'Save changes' : 'Add product' }}</button>
+      @if (message()) { <p class="admin-message" role="status">{{ message() }}</p> }
+    </form>
+
+    <section class="product-list" aria-labelledby="product-list-heading">
+      <div class="list-heading">
+        <div><p class="eyebrow">Current catalog</p><h2 id="product-list-heading">{{ products().length }} product cards</h2></div>
+      </div>
+
+      @if (products().length === 0) {
+        <p class="empty-list">There are no products yet. Add the first card using the form.</p>
+      } @else {
+        <ul>
+          @for (product of products(); track product.id) {
+            <li>
+              <img [src]="product.imageUrl" [alt]="product.imageAlt" width="100" height="100" />
+              <div class="product-details">
+                <span>{{ product.category }}</span>
+                <strong>{{ product.title }}</strong>
+                <small>{{ product.priceInCents / 100 | currency }}</small>
+              </div>
+              <div class="product-actions">
+                <button type="button" (click)="editProduct(product)">Edit</button>
+                <button class="delete-button" type="button" (click)="deleteProduct(product)">Delete</button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+  }
+  }
+</section>

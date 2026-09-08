@@ -1,0 +1,140 @@
+<section class="pos-section section" id="shop" aria-labelledby="shop-heading">
+  <div class="pos-heading">
+    <div>
+      <p class="eyebrow">The treat shop</p>
+      <h2 id="shop-heading">Build your sweet order</h2>
+      <p class="shop-intro">Choose your treats and quantities. We’ll confirm availability, pickup, and payment before your order is final.</p>
+    </div>
+    <div class="cart-pill" aria-live="polite">
+      <span class="cart-icon" aria-hidden="true">🛍️</span>
+      <span><strong>{{ itemCount() }}</strong> {{ itemCount() === 1 ? 'item' : 'items' }}</span>
+      <strong>{{ subtotalInCents() / 100 | currency }}</strong>
+    </div>
+  </div>
+
+  <div class="pos-layout">
+    <div class="product-grid" aria-label="Treats available to order">
+      @for (product of products(); track product.id) {
+        <article class="product-card">
+          <div class="product-image-wrap">
+            <img [src]="product.imageUrl" [alt]="product.imageAlt" loading="lazy" width="640" height="640" />
+            <span>{{ product.category }}</span>
+          </div>
+          <div class="product-copy">
+            <div class="product-title-row">
+              <h3>{{ product.title }}</h3>
+              <strong>{{ product.priceInCents / 100 | currency }}</strong>
+            </div>
+            <p>{{ product.description }}</p>
+            <div class="quantity-row">
+              <span class="quantity-label" [id]="'quantity-label-' + product.id">Quantity</span>
+              <div class="quantity-control" [attr.aria-labelledby]="'quantity-label-' + product.id">
+                <button type="button" (click)="changeQuantity(product.id, -1)" [disabled]="quantityFor(product.id) === 0" [attr.aria-label]="'Remove one ' + product.title">−</button>
+                <input type="number" min="0" max="24" [value]="quantityFor(product.id)" (change)="setQuantity(product.id, $event)" [attr.aria-label]="product.title + ' quantity'" />
+                <button type="button" (click)="changeQuantity(product.id, 1)" [disabled]="quantityFor(product.id) === 24" [attr.aria-label]="'Add one ' + product.title">+</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <aside class="cart-panel" aria-labelledby="cart-heading">
+      <div class="cart-panel-heading">
+        <div>
+          <p class="eyebrow">Your order</p>
+          <h3 id="cart-heading">Sweet cart</h3>
+        </div>
+        <span>{{ itemCount() }}</span>
+      </div>
+
+      @if (cartLines().length === 0) {
+        <div class="empty-cart">
+          <span aria-hidden="true">🍭</span>
+          <strong>Your cart is waiting</strong>
+          <p>Use the plus buttons to add something sweet.</p>
+        </div>
+      } @else {
+        <ul class="cart-lines">
+          @for (line of cartLines(); track line.product.id) {
+            <li>
+              <img [src]="line.product.imageUrl" alt="" width="64" height="64" />
+              <div>
+                <strong>{{ line.product.title }}</strong>
+                <span>{{ line.quantity }} × {{ line.product.priceInCents / 100 | currency }}</span>
+              </div>
+              <div class="cart-line-total">
+                <strong>{{ line.product.priceInCents * line.quantity / 100 | currency }}</strong>
+                <button type="button" (click)="removeLine(line.product.id)" [attr.aria-label]="'Remove ' + line.product.title + ' from cart'">Remove</button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+
+      <div class="cart-total">
+        <span>Subtotal</span>
+        <strong>{{ subtotalInCents() / 100 | currency }}</strong>
+      </div>
+      <p class="cart-note">Pickup timing, final availability, and payment are confirmed by an adult after your request.</p>
+      <button class="checkout-button" type="button" (click)="openCheckout()" [disabled]="itemCount() === 0">
+        Continue to checkout <span aria-hidden="true">→</span>
+      </button>
+
+      @if (orderMessage()) {
+        <p class="order-status" [class.order-status-error]="orderStatus() === 'error'" role="status">{{ orderMessage() }}</p>
+      }
+    </aside>
+  </div>
+
+  @if (checkoutOpen()) {
+    <div class="checkout-backdrop" (click)="closeCheckout()" aria-hidden="true"></div>
+    <section class="checkout-panel" role="dialog" aria-modal="true" aria-labelledby="checkout-heading">
+      <button class="checkout-close" type="button" (click)="closeCheckout()" aria-label="Close checkout">×</button>
+      <p class="eyebrow">Almost yours</p>
+      <h2 id="checkout-heading">Checkout details</h2>
+
+      <div class="checkout-summary">
+        <strong>{{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }}</strong>
+        <span>{{ subtotalInCents() / 100 | currency }} subtotal</span>
+      </div>
+
+      <form (submit)="submitOrder($event)" aria-describedby="checkout-privacy">
+        <input type="hidden" name="_subject" value="New Mathias Treats point-of-sale order" />
+        <input type="hidden" name="source" value="Mathias Treats online point of sale" />
+        <div class="honeypot" aria-hidden="true">
+          <label for="pos-company">Leave this field empty</label>
+          <input id="pos-company" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <label for="pos-name">Your name</label>
+        <input id="pos-name" name="name" type="text" autocomplete="name" required maxlength="80" />
+
+        <label for="pos-email">Your email</label>
+        <input id="pos-email" name="email" type="email" autocomplete="email" required maxlength="254" />
+
+        <label for="pos-phone">Phone <span>(optional)</span></label>
+        <input id="pos-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" />
+
+        <label for="pos-date">Requested pickup date <span>(optional)</span></label>
+        <input id="pos-date" name="requestedDate" type="date" />
+
+        <label for="pos-notes">Order notes <span>(optional)</span></label>
+        <textarea id="pos-notes" name="notes" rows="3" maxlength="750" placeholder="Colors, occasion, allergies to discuss, or anything else we should know"></textarea>
+
+        <div class="order-preview">
+          <strong>Order summary</strong>
+          <pre>{{ orderSummary() }}</pre>
+        </div>
+
+        <p id="checkout-privacy" class="checkout-privacy">This is an order request, not a completed purchase. Do not include payment details or a home address. An adult will contact you to confirm the order.</p>
+        <button class="checkout-button" type="submit" [disabled]="orderStatus() === 'sending'">
+          {{ orderStatus() === 'sending' ? 'Sending request…' : 'Send order request' }}
+        </button>
+        @if (orderMessage()) {
+          <p class="order-status" [class.order-status-error]="orderStatus() === 'error'" role="status">{{ orderMessage() }}</p>
+        }
+      </form>
+    </section>
+  }
+</section>
