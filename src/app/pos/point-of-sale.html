@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">The treat shop</p>
       <h2 id="shop-heading">Build your sweet order</h2>
-      <p class="shop-intro">Choose your treats and quantities. We’ll confirm availability, pickup, and payment before your order is final.</p>
+      <p class="shop-intro">Choose your treats and quantities. Every treat is $3, or mix and match any 4 for $10. The discount is applied automatically.</p>
     </div>
     <div class="cart-pill" aria-live="polite">
       <span class="cart-icon" aria-hidden="true">🛍️</span>
@@ -76,6 +76,9 @@
         <span>Subtotal</span>
         <strong>{{ subtotalInCents() / 100 | currency }}</strong>
       </div>
+      @if (bundleSavingsInCents() > 0) {
+        <p class="cart-note"><strong>You saved {{ bundleSavingsInCents() / 100 | currency }}</strong> with the 4-for-$10 offer.</p>
+      }
       <p class="cart-note">Pickup timing, final availability, and payment are confirmed by an adult after your request.</p>
       <button class="checkout-button" type="button" (click)="openCheckout()" [disabled]="itemCount() === 0">
         Continue to checkout <span aria-hidden="true">→</span>

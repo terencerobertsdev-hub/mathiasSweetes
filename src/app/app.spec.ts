@@ -46,24 +46,28 @@ describe('Mathias Treats site', () => {
     const element = fixture.nativeElement as HTMLElement;
 
     expect(element.querySelector('section#shop')).not.toBeNull();
-    expect(element.querySelectorAll('.product-card').length).toBe(6);
-    expect(element.querySelectorAll('input[type="number"]').length).toBe(6);
+    expect(element.querySelectorAll('.product-card').length).toBe(4);
+    expect(element.querySelectorAll('input[type="number"]').length).toBe(4);
     expect(element.textContent).toContain('Classic Vanilla Cakesicle');
-    expect(element.textContent).toContain('$4.50');
+    expect(element.textContent).toContain('$3.00');
     expect(element.textContent).toContain('Your cart is waiting');
   });
 
-  it('adds a product to the cart and calculates the subtotal', () => {
+  it('applies the four-for-ten-dollar offer', () => {
     const fixture = TestBed.createComponent(PointOfSale);
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
     const addButton = element.querySelector('.quantity-control button:last-child') as HTMLButtonElement;
 
     addButton.click();
+    addButton.click();
+    addButton.click();
+    addButton.click();
     fixture.detectChanges();
 
     expect(element.querySelector('.cart-lines')).not.toBeNull();
-    expect(element.querySelector('.cart-total')?.textContent).toContain('$4.50');
+    expect(element.querySelector('.cart-total')?.textContent).toContain('$10.00');
+    expect(element.textContent).toContain('You saved $2.00');
     expect(element.querySelector('.checkout-button')?.hasAttribute('disabled')).toBe(false);
   });
 

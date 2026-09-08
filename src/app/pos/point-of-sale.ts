@@ -29,8 +29,14 @@ export class PointOfSale {
   protected readonly itemCount = computed(() =>
     this.cartLines().reduce((total, line) => total + line.quantity, 0),
   );
-  protected readonly subtotalInCents = computed(() =>
+  protected readonly regularSubtotalInCents = computed(() =>
     this.cartLines().reduce((total, line) => total + line.product.priceInCents * line.quantity, 0),
+  );
+  protected readonly subtotalInCents = computed(() =>
+    Math.floor(this.itemCount() / 4) * 1000 + (this.itemCount() % 4) * 300,
+  );
+  protected readonly bundleSavingsInCents = computed(() =>
+    Math.max(0, this.regularSubtotalInCents() - this.subtotalInCents()),
   );
   protected readonly orderSummary = computed(() =>
     this.cartLines()
