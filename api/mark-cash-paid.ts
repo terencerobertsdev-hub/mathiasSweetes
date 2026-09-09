@@ -4,6 +4,14 @@ import { notifyPaidOrder } from './_lib/notifications.js';
 
 const ORDER_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+type CashOrderItem = {
+  product_title: string;
+  unit_price_in_cents: number;
+  quantity: number;
+  special_id: number | null;
+  specials: { title: string; qualifying_quantity: number; bundle_price_in_cents: number } | null;
+};
+
 export async function POST(request: Request): Promise<Response> {
   try {
     const admin = await requireAdmin(request);
@@ -11,13 +19,26 @@ export async function POST(request: Request): Promise<Response> {
     const { orderId } = await request.json() as { orderId?: string };
     if (!orderId || !ORDER_ID_PATTERN.test(orderId)) return json({ error: 'A valid order ID is required.' }, 400);
     const { data: order, error } = await admin.supabase.from('orders')
-      .select('id,customer_name,customer_email,customer_phone,requested_date,subtotal_in_cents,status,payment_method,stripe_invoice_id,order_items(product_title,unit_price_in_cents,quantity)')
+      .select('id,customer_name,customer_email,customer_phone,requested_date,subtotal_in_cents,status,payment_method,stripe_invoice_id,order_items(product_title,unit_price_in_cents,quantity,special_id,specials(title,qualifying_quantity,bundle_price_in_cents))')
       .eq('id', orderId).single();
     if (error || !order) return json({ error: 'Order not found.' }, 404);
     if (order.payment_method !== 'cash') return json({ error: 'Only cash orders can be marked paid here.' }, 409);
     if (order.status === 'paid') return json({ invoiceId: order.stripe_invoice_id, alreadyPaid: true });
-    const itemTotal = order.order_items.reduce((total, item) => total + item.unit_price_in_cents * item.quantity, 0);
-    if (!order.order_items.length || itemTotal !== order.subtotal_in_cents) return json({ error: 'The saved cash total could not be verified.' }, 409);
+    const orderItems = order.order_items as unknown as CashOrderItem[];
+    let itemTotal = orderItems.reduce((total, item) => total + item.unit_price_in_cents * item.quantity, 0);
+    let specialSavings = 0;
+    const specialGroups = new Map<number, CashOrderItem[]>();
+    for (const item of orderItems) {
+      if (item.special_id && item.specials) specialGroups.set(item.special_id, [...(specialGroups.get(item.special_id) ?? []), item]);
+    }
+    for (const group of specialGroups.values()) {
+      const special = group[0].specials!;
+      const quantity = group.reduce((total, item) => total + item.quantity, 0);
+      specialSavings += Math.floor(quantity / special.qualifying_quantity) *
+        ((special.qualifying_quantity * group[0].unit_price_in_cents) - special.bundle_price_in_cents);
+    }
+    itemTotal -= specialSavings;
+    if (!orderItems.length || itemTotal !== order.subtotal_in_cents) return json({ error: 'The saved cash total could not be verified.' }, 409);
 
     const stripeKey = process.env['STRIPE_SECRET_KEY'];
     if (!stripeKey) throw new Error('Stripe is not configured.');
@@ -31,8 +52,11 @@ export async function POST(request: Request): Promise<Response> {
     }, { idempotencyKey: `mathias-cash-invoice-${order.id}` });
     let currentInvoice = await stripe.invoices.retrieve(invoice.id);
     if (currentInvoice.status === 'draft') {
-      for (const [index, item] of order.order_items.entries()) {
+      for (const [index, item] of orderItems.entries()) {
         await stripe.invoiceItems.create({ customer: customer.id, invoice: invoice.id, amount: item.unit_price_in_cents * item.quantity, currency: 'usd', description: `${item.quantity} × ${item.product_title}` }, { idempotencyKey: `mathias-cash-line-${order.id}-${index}` });
+      }
+      if (specialSavings > 0) {
+        await stripe.invoiceItems.create({ customer: customer.id, invoice: invoice.id, amount: -specialSavings, currency: 'usd', description: 'Automatic cake pop special savings' }, { idempotencyKey: `mathias-cash-special-${order.id}` });
       }
       currentInvoice = await stripe.invoices.finalizeInvoice(invoice.id, { auto_advance: false }, { idempotencyKey: `mathias-cash-finalize-${order.id}` });
     }

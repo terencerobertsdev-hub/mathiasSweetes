@@ -73,27 +73,24 @@ describe('Mathias Treats site', () => {
     expect(element.querySelector('input[name="paymentMethod"][value="cash"]')).not.toBeNull();
   });
 
-  it('hides the special card when no special is active', () => {
+  it('hides the special banner when no special is active', () => {
     const fixture = TestBed.createComponent(PointOfSale);
     (fixture.componentInstance as any).special.set(null);
     fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).querySelector('.special-card')).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.special-banner')).toBeNull();
   });
 
-  it('prices the special card in four-treat bundles', () => {
+  it('automatically prices mixed regular flavors in four-treat bundles', () => {
     const fixture = TestBed.createComponent(PointOfSale);
     (fixture.componentInstance as any).special.set({ id: 1, title: '4 Cake Pops for $10', qualifying_quantity: 4, qualifying_unit_price_in_cents: 300, bundle_price_in_cents: 1000 });
+    (fixture.componentInstance as any).quantities.set({ 1: 2, 2: 4 });
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
-    const addButton = element.querySelector('button[aria-label="Add one special bundle"]') as HTMLButtonElement;
 
-    addButton.click();
-    addButton.click();
-    fixture.detectChanges();
-
+    expect(element.querySelector('.special-banner')).not.toBeNull();
     expect(element.querySelector('.cart-lines')).not.toBeNull();
-    expect(element.querySelector('.cart-total')?.textContent).toContain('$20.00');
-    expect(element.textContent).toContain('8 cake pops');
+    expect(element.querySelector('.cart-total')?.textContent).toContain('$16.00');
+    expect(element.querySelector('.special-savings')?.textContent).toContain('−$2.00');
     expect(element.querySelector('.checkout-button')?.hasAttribute('disabled')).toBe(false);
   });
 

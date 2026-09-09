@@ -92,7 +92,7 @@
     <div class="list-heading">
       <div><p class="eyebrow">Sales and specials</p><h2 id="special-heading">Run a special</h2></div>
     </div>
-    <p class="orders-guidance">Regular product prices stay unchanged. This adds a qualifying discount alongside those prices, shows the offer in the shop, and creates its matching Stripe price.</p>
+    <p class="orders-guidance">Regular product prices stay unchanged. When this special is on, the shop shows a cheerful banner and automatically groups qualifying flavors together for the discount. Customers continue ordering from the regular product cards.</p>
     <form class="special-form" (submit)="saveSpecial($event)">
       <label for="special-title">Special name</label>
       <input id="special-title" name="title" type="text" required maxlength="80" [value]="special()?.title || '4 Cake Pops for $10'" />

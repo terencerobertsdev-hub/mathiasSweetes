@@ -7,6 +7,15 @@ import {
 
 const ORDER_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+type CheckoutItem = {
+  product_title: string;
+  unit_price_in_cents: number;
+  quantity: number;
+  special_id: number | null;
+  stripe_price_id: string | null;
+  specials: { title: string; qualifying_quantity: number; bundle_price_in_cents: number } | null;
+};
+
 export async function POST(request: Request): Promise<Response> {
   try {
     const contentType = request.headers.get('content-type') ?? '';
@@ -30,7 +39,7 @@ export async function POST(request: Request): Promise<Response> {
         .select('id,status,payment_method,customer_email,subtotal_in_cents,stripe_checkout_session_id')
         .eq('id', orderId)
         .single(),
-      supabase.from('order_items').select('product_title,unit_price_in_cents,quantity,special_id,stripe_price_id').eq('order_id', orderId),
+      supabase.from('order_items').select('product_title,unit_price_in_cents,quantity,special_id,stripe_price_id,specials(title,qualifying_quantity,bundle_price_in_cents)').eq('order_id', orderId),
     ]);
 
     if (orderError || itemsError || !order || !items?.length) {
@@ -41,8 +50,23 @@ export async function POST(request: Request): Promise<Response> {
     }
     if (order.payment_method !== 'card') return json({ error: 'Cash orders do not use card checkout.' }, 409);
 
-    const itemCount = items.reduce((total, item) => total + Number(item.quantity), 0);
-    const expectedTotal = items.reduce((total, item) => total + Number(item.quantity) * Number(item.unit_price_in_cents), 0);
+    const checkoutItems = items as unknown as CheckoutItem[];
+    const itemCount = checkoutItems.reduce((total, item) => total + Number(item.quantity), 0);
+    let expectedTotal = 0;
+    const specialGroups = new Map<number, CheckoutItem[]>();
+    for (const item of checkoutItems) {
+      if (item.special_id && item.specials) {
+        specialGroups.set(item.special_id, [...(specialGroups.get(item.special_id) ?? []), item]);
+      } else {
+        expectedTotal += item.quantity * item.unit_price_in_cents;
+      }
+    }
+    for (const group of specialGroups.values()) {
+      const special = group[0].specials!;
+      const quantity = group.reduce((total, item) => total + item.quantity, 0);
+      expectedTotal += Math.floor(quantity / special.qualifying_quantity) * special.bundle_price_in_cents;
+      expectedTotal += (quantity % special.qualifying_quantity) * group[0].unit_price_in_cents;
+    }
     if (itemCount < 1 || itemCount > 720 || expectedTotal !== order.subtotal_in_cents) {
       return json({ error: 'The saved order total could not be verified.' }, 409);
     }
@@ -54,10 +78,24 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-    for (const item of items) {
-      const quantity = Number(item.quantity);
-      if (item.special_id && item.stripe_price_id) lineItems.push({ price: item.stripe_price_id, quantity });
-      else lineItems.push({ price_data: { currency: 'usd', unit_amount: item.unit_price_in_cents, product_data: { name: item.product_title, metadata: { site: 'mathias-treats' } } }, quantity });
+    for (const item of checkoutItems.filter((entry) => !entry.special_id)) {
+      lineItems.push({ price_data: { currency: 'usd', unit_amount: item.unit_price_in_cents, product_data: { name: item.product_title, metadata: { site: 'mathias-treats' } } }, quantity: item.quantity });
+    }
+    for (const group of specialGroups.values()) {
+      const special = group[0].specials!;
+      const bundleCount = Math.floor(group.reduce((total, item) => total + item.quantity, 0) / special.qualifying_quantity);
+      if (bundleCount > 0) {
+        if (group[0].stripe_price_id) lineItems.push({ price: group[0].stripe_price_id, quantity: bundleCount });
+        else lineItems.push({ price_data: { currency: 'usd', unit_amount: special.bundle_price_in_cents, product_data: { name: special.title, metadata: { site: 'mathias-treats' } } }, quantity: bundleCount });
+      }
+
+      let remaining = group.reduce((total, item) => total + item.quantity, 0) % special.qualifying_quantity;
+      for (const item of group) {
+        if (remaining === 0) break;
+        const quantity = Math.min(remaining, item.quantity);
+        lineItems.push({ price_data: { currency: 'usd', unit_amount: item.unit_price_in_cents, product_data: { name: item.product_title, metadata: { site: 'mathias-treats' } } }, quantity });
+        remaining -= quantity;
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
