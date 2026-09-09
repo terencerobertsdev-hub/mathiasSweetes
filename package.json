@@ -1,6 +1,7 @@
 {
   "name": "mathias-treats",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "ng": "ng",
