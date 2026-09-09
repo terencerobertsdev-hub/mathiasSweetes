@@ -8,7 +8,22 @@
     <a class="view-shop" href="/shop">View the shop <span aria-hidden="true">→</span></a>
   </header>
 
-  @if (!signedIn()) {
+  @if (recoveryMode()) {
+    <form class="product-editor" (submit)="updatePassword($event)">
+      <p class="eyebrow">Account security</p>
+      <h2>Choose a new password</h2>
+      <p class="reset-intro">Enter the new password twice so we can verify it before updating your account.</p>
+      <label for="new-admin-password">New password</label>
+      <input id="new-admin-password" name="newPassword" type="password" autocomplete="new-password" required minlength="12" />
+      <label for="confirm-admin-password">Confirm new password</label>
+      <input id="confirm-admin-password" name="confirmPassword" type="password" autocomplete="new-password" required minlength="12" />
+      <div class="reset-actions">
+        <button class="text-button cancel-button" type="button" (click)="cancelPasswordReset()">Cancel</button>
+        <button class="save-button" type="submit">Update password</button>
+      </div>
+      @if (message()) { <p class="admin-message" role="status" aria-live="polite">{{ message() }}</p> }
+    </form>
+  } @else if (!signedIn()) {
     <form #signInForm class="product-editor" (submit)="signIn($event)">
       <p class="eyebrow">Authorized staff only</p>
       <h2>Sign in</h2>
@@ -17,18 +32,10 @@
       <label for="admin-password">Password</label>
       <input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="8" />
       <button class="save-button" type="submit">Sign in securely</button>
-      <button class="text-button" type="button" (click)="requestPasswordReset(signInForm)">Forgot or change password</button>
-      @if (message()) { <p class="admin-message" role="status">{{ message() }}</p> }
-    </form>
-  } @else {
-  @if (recoveryMode()) {
-    <form class="product-editor" (submit)="updatePassword($event)">
-      <p class="eyebrow">Account security</p>
-      <h2>Choose a new password</h2>
-      <label for="new-admin-password">New password</label>
-      <input id="new-admin-password" name="newPassword" type="password" autocomplete="new-password" required minlength="12" />
-      <button class="save-button" type="submit">Update password</button>
-      @if (message()) { <p class="admin-message" role="status">{{ message() }}</p> }
+      <button class="text-button" type="button" (click)="requestPasswordReset(signInForm)" [disabled]="passwordResetStatus() === 'sending'">
+        {{ passwordResetStatus() === 'sending' ? 'Sending reset email…' : 'Forgot or change password' }}
+      </button>
+      @if (message()) { <p class="admin-message" role="status" aria-live="polite">{{ message() }}</p> }
     </form>
   } @else {
   <div class="admin-notice" role="note">
@@ -106,6 +113,5 @@
       }
     </section>
   </div>
-  }
   }
 </section>
