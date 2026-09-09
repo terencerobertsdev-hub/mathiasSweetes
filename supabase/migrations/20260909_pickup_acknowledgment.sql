@@ -23,6 +23,15 @@ begin
   if char_length(trim(customer->>'email')) not between 5 and 254 then
     raise exception 'Valid email is required';
   end if;
+  if char_length(trim(customer->>'phone')) not between 7 and 30 then
+    raise exception 'Valid phone is required';
+  end if;
+  if nullif(customer->>'requested_date', '')::date < current_date then
+    raise exception 'Pickup date cannot be in the past';
+  end if;
+  if nullif(customer->>'requested_date', '') is null then
+    raise exception 'Pickup date is required';
+  end if;
   if coalesce((customer->>'pickup_acknowledged')::boolean, false) is not true then
     raise exception 'Local pickup must be acknowledged';
   end if;

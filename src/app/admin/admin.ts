@@ -10,12 +10,15 @@ type AdminOrder = {
   id: string;
   customer_name: string;
   customer_email: string;
+  customer_phone: string | null;
   requested_date: string | null;
+  notes: string | null;
   subtotal_in_cents: number;
   status: string;
   paid_at: string | null;
   pickup_time_confirmed: string | null;
   address_released_at: string | null;
+  order_items: { product_title: string; quantity: number; unit_price_in_cents: number }[];
 };
 
 @Component({
@@ -75,7 +78,7 @@ export class Admin {
     this.ordersLoading.set(true);
     const { data, error } = await this.supabase
       .from('orders')
-      .select('id,customer_name,customer_email,requested_date,subtotal_in_cents,status,paid_at,pickup_time_confirmed,address_released_at')
+      .select('id,customer_name,customer_email,customer_phone,requested_date,notes,subtotal_in_cents,status,paid_at,pickup_time_confirmed,address_released_at,order_items(product_title,quantity,unit_price_in_cents)')
       .order('created_at', { ascending: false })
       .limit(100);
     this.ordersLoading.set(false);

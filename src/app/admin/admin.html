@@ -56,18 +56,25 @@
     } @else {
       <div class="orders-table-wrap">
         <table>
-          <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Pickup authorization</th></tr></thead>
+          <thead><tr><th>Order details</th><th>Customer</th><th>Total</th><th>Status</th><th>Pickup authorization</th></tr></thead>
           <tbody>
             @for (order of orders(); track order.id) {
               <tr>
-                <td><strong>{{ order.id.slice(0, 8) }}</strong><small>{{ order.requested_date || 'No date requested' }}</small></td>
-                <td>{{ order.customer_name }}<small>{{ order.customer_email }}</small></td>
+                <td>
+                  <strong>{{ order.id.slice(0, 8) }}</strong>
+                  @for (item of order.order_items; track item.product_title) {
+                    <small>{{ item.quantity }} × {{ item.product_title }}</small>
+                  }
+                  @if (order.notes) { <small><strong>Notes:</strong> {{ order.notes }}</small> }
+                </td>
+                <td>{{ order.customer_name }}<small>{{ order.customer_email }}</small><small>{{ order.customer_phone || 'No phone supplied' }}</small></td>
                 <td>{{ order.subtotal_in_cents / 100 | currency }}</td>
                 <td><span class="order-status" [class.paid]="order.status === 'paid'">{{ order.status }}</span></td>
                 <td>
                   @if (order.address_released_at) {
                     <strong class="released">Address released</strong><small>{{ order.pickup_time_confirmed }}</small>
                   } @else if (order.status === 'paid') {
+                    <small>Requested: {{ order.requested_date || 'Not supplied' }}</small>
                     <label [for]="'pickup-time-' + order.id">Confirmed pickup date and time</label>
                     <input #pickupTime [id]="'pickup-time-' + order.id" type="datetime-local" required />
                     <button class="approve-button" type="button" (click)="approvePickup(order, pickupTime)">Approve pickup &amp; release address</button>

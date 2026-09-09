@@ -63,6 +63,8 @@ describe('Mathias Treats site', () => {
     (element.querySelector('aside .checkout-button') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(element.querySelector('#pos-pickup-acknowledged[required]')).not.toBeNull();
+    expect(element.querySelector('#pos-phone[required]')).not.toBeNull();
+    expect(element.querySelector('#pos-date[required]')).not.toBeNull();
   });
 
   it('applies the four-for-ten-dollar offer', () => {
