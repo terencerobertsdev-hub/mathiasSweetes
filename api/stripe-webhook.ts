@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { getServerSupabase, json } from './_lib/commerce.js';
+import { notifyPaidOrder } from './_lib/notifications.js';
 
 const SUPPORTED_EVENTS = new Set([
   'checkout.session.completed',
@@ -34,7 +35,7 @@ export async function POST(request: Request): Promise<Response> {
     ? 'failed'
     : session.payment_status;
   const supabase = getServerSupabase();
-  const { error } = await supabase.rpc('record_stripe_payment', {
+  const { data: recorded, error } = await supabase.rpc('record_stripe_payment', {
     p_event_id: event.id,
     p_order_id: orderId,
     p_checkout_session_id: session.id,
@@ -46,6 +47,14 @@ export async function POST(request: Request): Promise<Response> {
   if (error) {
     console.error('Stripe webhook database error', error.message);
     return json({ error: 'The payment event could not be recorded.' }, 500);
+  }
+  if (recorded && paymentStatus === 'paid') {
+    const { data: order } = await supabase
+      .from('orders')
+      .select('id,customer_name,customer_email,customer_phone,requested_date,subtotal_in_cents')
+      .eq('id', orderId)
+      .single();
+    if (order) await notifyPaidOrder(order);
   }
   return json({ received: true });
 }

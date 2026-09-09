@@ -6,6 +6,18 @@ import { SupabaseService } from '../supabase.service';
 
 const ADMIN_RECOVERY_URL = 'https://mathiastreats.com/admin/reset-password';
 
+type AdminOrder = {
+  id: string;
+  customer_name: string;
+  customer_email: string;
+  requested_date: string | null;
+  subtotal_in_cents: number;
+  status: string;
+  paid_at: string | null;
+  pickup_time_confirmed: string | null;
+  address_released_at: string | null;
+};
+
 @Component({
   selector: 'app-admin',
   imports: [CurrencyPipe],
@@ -19,6 +31,8 @@ export class Admin {
   private readonly document = inject(DOCUMENT);
 
   protected readonly products = this.productRepository.getProducts();
+  protected readonly orders = signal<AdminOrder[]>([]);
+  protected readonly ordersLoading = signal(false);
   protected readonly editingId = signal<number | null>(null);
   protected readonly imagePreview = signal('');
   protected readonly message = signal(
@@ -32,9 +46,13 @@ export class Admin {
   private selectedImage: File | null = null;
 
   constructor() {
-    void this.supabase.auth.getSession().then(({ data }) => this.signedIn.set(Boolean(data.session)));
+    void this.supabase.auth.getSession().then(({ data }) => {
+      this.signedIn.set(Boolean(data.session));
+      if (data.session) void this.loadOrders();
+    });
     this.supabase.auth.onAuthStateChange((event, session) => {
       this.signedIn.set(Boolean(session));
+      if (session) void this.loadOrders();
       if (event === 'PASSWORD_RECOVERY') this.recoveryMode.set(true);
     });
   }
@@ -51,6 +69,47 @@ export class Admin {
   protected async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
     this.message.set('You are signed out.');
+  }
+
+  protected async loadOrders(): Promise<void> {
+    this.ordersLoading.set(true);
+    const { data, error } = await this.supabase
+      .from('orders')
+      .select('id,customer_name,customer_email,requested_date,subtotal_in_cents,status,paid_at,pickup_time_confirmed,address_released_at')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    this.ordersLoading.set(false);
+    if (error) {
+      this.message.set('Orders could not be loaded. Confirm the database migration and administrator access.');
+      return;
+    }
+    this.orders.set((data ?? []) as AdminOrder[]);
+  }
+
+  protected async approvePickup(order: AdminOrder, input: HTMLInputElement): Promise<void> {
+    const pickupTime = input.value.trim();
+    if (!pickupTime) {
+      this.message.set('Enter and confirm a pickup date and time before releasing the address.');
+      input.focus();
+      return;
+    }
+    const { data } = await this.supabase.auth.getSession();
+    if (!data.session) {
+      this.message.set('Your administrator session expired. Sign in again.');
+      return;
+    }
+    const response = await fetch('/api/approve-pickup', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${data.session.access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: order.id, pickupTime }),
+    });
+    const result = await response.json() as { approved?: boolean; error?: string };
+    if (!response.ok || !result.approved) {
+      this.message.set(result.error ?? 'Pickup approval failed. The address was not released.');
+      return;
+    }
+    this.message.set(`Pickup approved for order ${order.id.slice(0, 8)}. The customer was emailed privately and the release was logged.`);
+    await this.loadOrders();
   }
 
   protected async requestPasswordReset(form: HTMLFormElement): Promise<void> {
