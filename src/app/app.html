@@ -124,6 +124,11 @@
       <label for="order-details">Describe your custom order</label>
       <textarea id="order-details" name="orderDetails" rows="6" required minlength="10" maxlength="1500" placeholder="Tell us the treat type, flavor, quantity, colors, decorations, occasion, and timing."></textarea>
 
+      <label class="pickup-agreement" for="custom-pickup-acknowledged">
+        <input id="custom-pickup-acknowledged" name="pickupAcknowledged" type="checkbox" value="Yes" required />
+        <span><strong>I understand this is a local pickup order.</strong> I will pick up the completed order in Canton or arrange for a delivery service to collect it from the pickup location.</span>
+      </label>
+
       <p id="order-form-privacy" class="form-privacy">This form is monitored by an adult. Your information is used only to respond to this order request.</p>
       <button class="button button-primary" type="submit" [disabled]="orderStatus() === 'sending'">
         {{ orderStatus() === 'sending' ? 'Sending…' : 'Send custom order request' }}

@@ -70,6 +70,10 @@
 .order-preview { margin-top: .8rem; padding: 1rem; border-radius: .8rem; background: var(--surface); }
 .order-preview strong { color: var(--purple-900); }
 .order-preview pre { margin: .6rem 0 0; color: var(--muted); font: 500 .78rem/1.6 var(--font-body); white-space: pre-wrap; }
+.pickup-agreement { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: .75rem; margin: .8rem 0; padding: 1rem; border: 2px solid var(--aqua); border-radius: .8rem; background: #edfffe; font-size: .82rem; line-height: 1.45; }
+.checkout-panel .pickup-agreement input { width: 1.2rem; height: 1.2rem; margin-top: .15rem; accent-color: var(--purple-700); }
+.pickup-agreement span { color: var(--muted); }
+.pickup-agreement strong { color: var(--purple-900); }
 .checkout-privacy { color: var(--muted); font-size: .78rem; }
 .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 

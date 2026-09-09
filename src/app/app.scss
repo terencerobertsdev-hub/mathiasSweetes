@@ -71,6 +71,10 @@ h1 span::after { content: ''; position: absolute; left: 1%; right: 0; bottom: .1
 .order-form label { margin-top: .55rem; color: var(--purple-900); font-weight: 800; }
 .order-form label span { color: var(--muted); font-weight: 600; }
 .order-form input, .order-form textarea { width: 100%; padding: .85rem 1rem; border: 2px solid #d8cde6; border-radius: .7rem; background: #fff; color: var(--purple-900); font: inherit; }
+.pickup-agreement { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: .75rem; margin-top: 1rem; padding: 1rem; border: 2px solid var(--aqua); border-radius: .8rem; background: #edfffe; font-size: .84rem; line-height: 1.45; }
+.order-form .pickup-agreement input { width: 1.2rem; height: 1.2rem; margin-top: .15rem; padding: 0; accent-color: var(--purple-700); }
+.pickup-agreement span { color: var(--muted); font-weight: 500; }
+.pickup-agreement strong { color: var(--purple-900); }
 .order-form textarea { resize: vertical; }
 .order-form input:focus, .order-form textarea:focus { border-color: var(--purple-700); outline: 3px solid rgba(98,223,220,.45); outline-offset: 2px; }
 .form-privacy { margin: .75rem 0; color: var(--muted); font-size: .84rem; }

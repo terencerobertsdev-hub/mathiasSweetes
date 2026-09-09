@@ -24,6 +24,7 @@ describe('Mathias Treats site', () => {
     expect(element.textContent).toContain('Place a custom order');
     expect(element.textContent).toContain('standard treats and common flavors');
     expect(element.querySelector('#order-form a[href="/shop"]')).not.toBeNull();
+    expect(element.querySelector('#custom-pickup-acknowledged[required]')).not.toBeNull();
     expect(element.querySelector('a[href="https://fawaii-custom-cookies.com/"]')).not.toBeNull();
     expect(element.querySelector('.fawaii-support img')?.getAttribute('alt')).toBe('Fawaii logo');
     expect(element.textContent).toContain('Website crafted by');
@@ -57,6 +58,11 @@ describe('Mathias Treats site', () => {
     expect(element.textContent).toContain('Classic Vanilla Cakesicle');
     expect(element.textContent).toContain('$3.00');
     expect(element.textContent).toContain('Your cart is waiting');
+    (element.querySelector('.quantity-control button:last-child') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    (element.querySelector('aside .checkout-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(element.querySelector('#pos-pickup-acknowledged[required]')).not.toBeNull();
   });
 
   it('applies the four-for-ten-dollar offer', () => {

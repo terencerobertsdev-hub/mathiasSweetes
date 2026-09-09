@@ -99,7 +99,7 @@ export class PointOfSale {
 
     try {
       const { data: orderId, error } = await this.supabase.rpc('place_order', {
-        customer: { name: String(formData.get('name')), email: String(formData.get('email')), phone: String(formData.get('phone') ?? ''), requested_date: String(formData.get('requestedDate') ?? ''), notes: String(formData.get('notes') ?? '') },
+        customer: { name: String(formData.get('name')), email: String(formData.get('email')), phone: String(formData.get('phone') ?? ''), requested_date: String(formData.get('requestedDate') ?? ''), notes: String(formData.get('notes') ?? ''), pickup_acknowledged: formData.get('pickupAcknowledged') === 'true' },
         items: this.cartLines().map((line) => ({ product_id: line.product.id, quantity: line.quantity })),
       });
       if (error) throw error;
