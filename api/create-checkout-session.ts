@@ -1,10 +1,7 @@
 import Stripe from 'stripe';
 import {
-  calculateTotal,
-  FOUR_TREAT_PRICE_ID,
   getServerSupabase,
   json,
-  SINGLE_TREAT_PRICE_ID,
   SITE_URL,
 } from './_lib/commerce.js';
 
@@ -30,10 +27,10 @@ export async function POST(request: Request): Promise<Response> {
     const [{ data: order, error: orderError }, { data: items, error: itemsError }] = await Promise.all([
       supabase
         .from('orders')
-        .select('id,status,customer_email,subtotal_in_cents,stripe_checkout_session_id')
+        .select('id,status,payment_method,customer_email,subtotal_in_cents,stripe_checkout_session_id')
         .eq('id', orderId)
         .single(),
-      supabase.from('order_items').select('quantity').eq('order_id', orderId),
+      supabase.from('order_items').select('product_title,unit_price_in_cents,quantity,special_id,stripe_price_id').eq('order_id', orderId),
     ]);
 
     if (orderError || itemsError || !order || !items?.length) {
@@ -42,9 +39,10 @@ export async function POST(request: Request): Promise<Response> {
     if (order.status === 'paid') {
       return json({ error: 'This order is already paid.' }, 409);
     }
+    if (order.payment_method !== 'card') return json({ error: 'Cash orders do not use card checkout.' }, 409);
 
     const itemCount = items.reduce((total, item) => total + Number(item.quantity), 0);
-    const expectedTotal = calculateTotal(itemCount);
+    const expectedTotal = items.reduce((total, item) => total + Number(item.quantity) * Number(item.unit_price_in_cents), 0);
     if (itemCount < 1 || itemCount > 720 || expectedTotal !== order.subtotal_in_cents) {
       return json({ error: 'The saved order total could not be verified.' }, 409);
     }
@@ -55,11 +53,12 @@ export async function POST(request: Request): Promise<Response> {
       if (existing.status === 'open' && existing.url) return json({ url: existing.url });
     }
 
-    const bundleQuantity = Math.floor(itemCount / 4);
-    const singleQuantity = itemCount % 4;
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-    if (bundleQuantity) lineItems.push({ price: FOUR_TREAT_PRICE_ID, quantity: bundleQuantity });
-    if (singleQuantity) lineItems.push({ price: SINGLE_TREAT_PRICE_ID, quantity: singleQuantity });
+    for (const item of items) {
+      const quantity = Number(item.quantity);
+      if (item.special_id && item.stripe_price_id) lineItems.push({ price: item.stripe_price_id, quantity });
+      else lineItems.push({ price_data: { currency: 'usd', unit_amount: item.unit_price_in_cents, product_data: { name: item.product_title, metadata: { site: 'mathias-treats' } } }, quantity });
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

@@ -48,7 +48,7 @@
       <div><p class="eyebrow">Paid pickup fulfillment</p><h2 id="orders-heading">Orders</h2></div>
       <button class="text-button" type="button" (click)="loadOrders()">Refresh orders</button>
     </div>
-    <p class="orders-guidance">The address stays private until Stripe confirms payment. Paid customers receive it on their receipt, and the release is recorded automatically.</p>
+    <p class="orders-guidance">Card orders are paid through Stripe. For cash orders, record payment only after the cash is physically received; Stripe will log the real sale total as paid outside Stripe without charging a card.</p>
     @if (ordersLoading()) {
       <p role="status">Loading orders…</p>
     } @else if (orders().length === 0) {
@@ -68,7 +68,7 @@
                   @if (order.notes) { <small><strong>Notes:</strong> {{ order.notes }}</small> }
                 </td>
                 <td>{{ order.customer_name }}<small>{{ order.customer_email }}</small><small>{{ order.customer_phone || 'No phone supplied' }}</small></td>
-                <td>{{ order.subtotal_in_cents / 100 | currency }}</td>
+                <td>{{ order.subtotal_in_cents / 100 | currency }}<small>{{ order.payment_method === 'cash' ? 'Cash' : 'Card' }}</small></td>
                 <td><span class="order-status" [class.paid]="order.status === 'paid'">{{ order.status }}</span></td>
                 <td>
                   @if (order.address_released_at) {
@@ -77,6 +77,7 @@
                     <span>Processing paid receipt</span>
                   } @else {
                     <span>Waiting for payment</span>
+                    @if (order.payment_method === 'cash') { <button class="cash-paid-button" type="button" (click)="markCashPaid(order)">Mark cash received</button> }
                   }
                 </td>
               </tr>
@@ -85,6 +86,25 @@
         </table>
       </div>
     }
+  </section>
+
+  <section class="orders-panel" aria-labelledby="special-heading">
+    <div class="list-heading">
+      <div><p class="eyebrow">Sales and specials</p><h2 id="special-heading">Run a special</h2></div>
+    </div>
+    <p class="orders-guidance">Regular product prices stay unchanged. This adds a qualifying discount alongside those prices, shows the offer in the shop, and creates its matching Stripe price.</p>
+    <form class="special-form" (submit)="saveSpecial($event)">
+      <label for="special-title">Special name</label>
+      <input id="special-title" name="title" type="text" required maxlength="80" [value]="special()?.title || '4 Cake Pops for $10'" />
+      <label for="special-quantity">Number of treats</label>
+      <input id="special-quantity" name="quantity" type="number" required min="2" max="100" [value]="special()?.qualifying_quantity || 4" />
+      <label for="special-unit-price">Regular price per treat</label>
+      <div class="price-field"><span aria-hidden="true">$</span><input id="special-unit-price" name="unitPrice" type="number" required min="0.01" max="999.99" step="0.01" [value]="(special()?.qualifying_unit_price_in_cents || 300) / 100" /></div>
+      <label for="special-bundle-price">Special bundle price</label>
+      <div class="price-field"><span aria-hidden="true">$</span><input id="special-bundle-price" name="bundlePrice" type="number" required min="0.01" max="9999.99" step="0.01" [value]="(special()?.bundle_price_in_cents || 1000) / 100" /></div>
+      <label class="special-toggle" for="special-active"><input id="special-active" name="isActive" type="checkbox" value="true" [checked]="special()?.is_active === true" /> <span>Run this special now</span></label>
+      <button class="save-button" type="submit" [disabled]="specialSaving()">{{ specialSaving() ? 'Updating Stripe…' : 'Publish special' }}</button>
+    </form>
   </section>
 
   <div class="admin-layout">

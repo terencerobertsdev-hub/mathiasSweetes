@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">The treat shop</p>
       <h2 id="shop-heading">Build your sweet order</h2>
-      <p class="shop-intro">Choose your treats and quantities. Every treat is $3, or mix and match any 4 for $10. The discount is applied automatically.</p>
+      <p class="shop-intro">Choose regular treats at their listed prices. @if (special(); as offer) { The limited-time <strong>{{ offer.title }}</strong> card is available below. }</p>
     </div>
     <div class="cart-pill" aria-live="polite">
       <span class="cart-icon" aria-hidden="true">🛍️</span>
@@ -37,6 +37,23 @@
           </div>
         </article>
       }
+      @if (special(); as offer) {
+        <article class="product-card special-card">
+          <div class="special-card-art" aria-hidden="true"><span>⭐</span><strong>{{ offer.qualifying_quantity }} for {{ offer.bundle_price_in_cents / 100 | currency }}</strong></div>
+          <div class="product-copy">
+            <div class="product-title-row"><h3>{{ offer.title }}</h3><strong>{{ offer.bundle_price_in_cents / 100 | currency }}</strong></div>
+            <p>Order this deal in groups of {{ offer.qualifying_quantity }}. Choose {{ offer.qualifying_quantity }}, {{ offer.qualifying_quantity * 2 }}, {{ offer.qualifying_quantity * 3 }}, or more.</p>
+            <div class="quantity-row">
+              <span class="quantity-label" id="special-quantity-label">Cake pops</span>
+              <div class="quantity-control" aria-labelledby="special-quantity-label">
+                <button type="button" (click)="changeSpecialBundles(-1)" [disabled]="specialBundles() === 0" aria-label="Remove one special bundle">−</button>
+                <input type="number" min="0" [max]="offer.qualifying_quantity * 24" [step]="offer.qualifying_quantity" [value]="specialBundles() * offer.qualifying_quantity" (change)="setSpecialQuantity($event)" aria-label="Special cake pop quantity" />
+                <button type="button" (click)="changeSpecialBundles(1)" [disabled]="specialBundles() === 24" aria-label="Add one special bundle">+</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      }
     </div>
 
     <aside class="cart-panel" aria-labelledby="cart-heading">
@@ -48,7 +65,7 @@
         <span>{{ itemCount() }}</span>
       </div>
 
-      @if (cartLines().length === 0) {
+      @if (cartLines().length === 0 && specialBundles() === 0) {
         <div class="empty-cart">
           <span aria-hidden="true">🍭</span>
           <strong>Your cart is waiting</strong>
@@ -69,6 +86,13 @@
               </div>
             </li>
           }
+          @if (special(); as offer) { @if (specialBundles() > 0) {
+            <li>
+              <div class="special-cart-icon" aria-hidden="true">⭐</div>
+              <div><strong>{{ offer.title }}</strong><span>{{ specialBundles() * offer.qualifying_quantity }} cake pops</span></div>
+              <div class="cart-line-total"><strong>{{ specialBundles() * offer.bundle_price_in_cents / 100 | currency }}</strong><button type="button" (click)="specialBundles.set(0)">Remove</button></div>
+            </li>
+          } }
         </ul>
       }
 
@@ -76,10 +100,7 @@
         <span>Subtotal</span>
         <strong>{{ subtotalInCents() / 100 | currency }}</strong>
       </div>
-      @if (bundleSavingsInCents() > 0) {
-        <p class="cart-note"><strong>You saved {{ bundleSavingsInCents() / 100 | currency }}</strong> with the 4-for-$10 offer.</p>
-      }
-      <p class="cart-note">Pay securely with Stripe. Pickup timing and final availability are confirmed by an adult.</p>
+      <p class="cart-note">Choose secure card payment or reserve the order and pay cash at pickup.</p>
       <button class="checkout-button" type="button" (click)="openCheckout()" [disabled]="itemCount() === 0">
         Continue to checkout <span aria-hidden="true">→</span>
       </button>
@@ -130,14 +151,20 @@
           <pre>{{ orderSummary() }}</pre>
         </div>
 
+        <fieldset class="payment-choice">
+          <legend>How will you pay?</legend>
+          <label><input name="paymentMethod" type="radio" value="card" checked required /> Card through Stripe</label>
+          <label><input name="paymentMethod" type="radio" value="cash" required /> Cash at pickup</label>
+        </fieldset>
+
         <label class="pickup-agreement" for="pos-pickup-acknowledged">
           <input id="pos-pickup-acknowledged" name="pickupAcknowledged" type="checkbox" value="true" required />
           <span><strong>I understand this is a local pickup order in Canton, Georgia.</strong> I will pick up the labeled order from the outside pickup cart or arrange for a delivery service to collect it. The exact address is released only after payment.</span>
         </label>
 
-        <p id="checkout-privacy" class="checkout-privacy">You will continue to Stripe’s secure payment page. Do not enter payment details in the notes. Your paid receipt includes the private pickup address.</p>
+        <p id="checkout-privacy" class="checkout-privacy">Card orders continue to Stripe. Cash orders are reserved without a card charge; an adult records the sale after receiving cash. The private pickup address is released only after payment.</p>
         <button class="checkout-button" type="submit" [disabled]="orderStatus() === 'sending'">
-          {{ orderStatus() === 'sending' ? 'Opening secure checkout…' : 'Pay securely with Stripe' }}
+          {{ orderStatus() === 'sending' ? 'Placing order…' : 'Place order' }}
         </button>
         @if (orderMessage()) {
           <p class="order-status" [class.order-status-error]="orderStatus() === 'error'" role="status">{{ orderMessage() }}</p>

@@ -69,23 +69,31 @@ describe('Mathias Treats site', () => {
     expect(element.querySelector('#pos-pickup-acknowledged[required]')).not.toBeNull();
     expect(element.querySelector('#pos-phone[required]')).not.toBeNull();
     expect(element.querySelector('#pos-date[required]')).not.toBeNull();
+    expect(element.querySelector('input[name="paymentMethod"][value="card"]')).not.toBeNull();
+    expect(element.querySelector('input[name="paymentMethod"][value="cash"]')).not.toBeNull();
   });
 
-  it('applies the four-for-ten-dollar offer', () => {
+  it('hides the special card when no special is active', () => {
     const fixture = TestBed.createComponent(PointOfSale);
+    (fixture.componentInstance as any).special.set(null);
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.special-card')).toBeNull();
+  });
+
+  it('prices the special card in four-treat bundles', () => {
+    const fixture = TestBed.createComponent(PointOfSale);
+    (fixture.componentInstance as any).special.set({ id: 1, title: '4 Cake Pops for $10', qualifying_quantity: 4, qualifying_unit_price_in_cents: 300, bundle_price_in_cents: 1000 });
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
-    const addButton = element.querySelector('.quantity-control button:last-child') as HTMLButtonElement;
+    const addButton = element.querySelector('button[aria-label="Add one special bundle"]') as HTMLButtonElement;
 
-    addButton.click();
-    addButton.click();
     addButton.click();
     addButton.click();
     fixture.detectChanges();
 
     expect(element.querySelector('.cart-lines')).not.toBeNull();
-    expect(element.querySelector('.cart-total')?.textContent).toContain('$10.00');
-    expect(element.textContent).toContain('You saved $2.00');
+    expect(element.querySelector('.cart-total')?.textContent).toContain('$20.00');
+    expect(element.textContent).toContain('8 cake pops');
     expect(element.querySelector('.checkout-button')?.hasAttribute('disabled')).toBe(false);
   });
 

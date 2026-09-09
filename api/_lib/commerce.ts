@@ -27,3 +27,13 @@ export function json(body: unknown, status = 200): Response {
 export function calculateTotal(itemCount: number): number {
   return Math.floor(itemCount / 4) * 1000 + (itemCount % 4) * 300;
 }
+
+export async function requireAdmin(request: Request) {
+  const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) return null;
+  const supabase = getServerSupabase();
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error || !user) return null;
+  const { data: admin } = await supabase.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
+  return admin ? { user, supabase } : null;
+}

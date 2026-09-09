@@ -13,6 +13,11 @@
 .pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 350px); align-items: start; gap: 1.5rem; }
 .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
 .product-card { min-width: 0; overflow: hidden; border: 2px solid rgba(91, 33, 182, .12); border-radius: 1.5rem; background: #fff; box-shadow: 0 12px 30px rgba(53, 16, 96, .09); }
+.special-card { border: 3px solid var(--yellow); }
+.special-card-art { min-height: 230px; display: grid; place-items: center; align-content: center; gap: .5rem; background: radial-gradient(circle at 30% 20%, #fff 0 8%, transparent 9%), linear-gradient(135deg, var(--yellow), var(--aqua)); color: var(--purple-900); text-align: center; }
+.special-card-art span { font-size: 3rem; }
+.special-card-art strong { font: 800 clamp(1.8rem, 4vw, 3rem)/1 var(--font-display); }
+.special-cart-icon { width: 64px; height: 64px; display: grid; place-items: center; border-radius: .8rem; background: var(--yellow); font-size: 1.6rem; }
 .product-image-wrap { position: relative; aspect-ratio: 16 / 11; overflow: hidden; background: var(--surface); }
 .product-image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
 .product-card:hover .product-image-wrap img { transform: scale(1.03); }
@@ -72,6 +77,10 @@
 .order-preview pre { margin: .6rem 0 0; color: var(--muted); font: 500 .78rem/1.6 var(--font-body); white-space: pre-wrap; }
 .pickup-agreement { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: .75rem; margin: .8rem 0; padding: 1rem; border: 2px solid var(--aqua); border-radius: .8rem; background: #edfffe; font-size: .82rem; line-height: 1.45; }
 .checkout-panel .pickup-agreement input { width: 1.2rem; height: 1.2rem; margin-top: .15rem; accent-color: var(--purple-700); }
+.payment-choice { display: grid; gap: .65rem; margin: 1rem 0; padding: 1rem; border: 2px solid #d8cde6; border-radius: .8rem; }
+.payment-choice legend { padding: 0 .35rem; color: var(--purple-900); font-weight: 800; }
+.payment-choice label { display: flex; align-items: center; gap: .6rem; margin: 0; }
+.checkout-panel .payment-choice input { width: 1.15rem; height: 1.15rem; accent-color: var(--purple-700); }
 .pickup-agreement span { color: var(--muted); }
 .pickup-agreement strong { color: var(--purple-900); }
 .checkout-privacy { color: var(--muted); font-size: .78rem; }

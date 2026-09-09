@@ -14,12 +14,15 @@ type AdminOrder = {
   requested_date: string | null;
   notes: string | null;
   subtotal_in_cents: number;
+  payment_method: 'card' | 'cash';
+  stripe_invoice_id: string | null;
   status: string;
   paid_at: string | null;
   pickup_time_confirmed: string | null;
   address_released_at: string | null;
   order_items: { product_title: string; quantity: number; unit_price_in_cents: number }[];
 };
+type Special = { title: string; qualifying_quantity: number; qualifying_unit_price_in_cents: number; bundle_price_in_cents: number; is_active: boolean };
 @Component({
   selector: 'app-admin',
   imports: [CurrencyPipe],
@@ -35,6 +38,8 @@ export class Admin {
   protected readonly products = this.productRepository.getProducts();
   protected readonly orders = signal<AdminOrder[]>([]);
   protected readonly ordersLoading = signal(false);
+  protected readonly special = signal<Special | null>(null);
+  protected readonly specialSaving = signal(false);
   protected readonly editingId = signal<number | null>(null);
   protected readonly imagePreview = signal('');
   protected readonly message = signal(
@@ -50,11 +55,11 @@ export class Admin {
   constructor() {
     void this.supabase.auth.getSession().then(({ data }) => {
       this.signedIn.set(Boolean(data.session));
-      if (data.session) void this.loadOrders();
+      if (data.session) { void this.loadOrders(); void this.loadSpecial(); }
     });
     this.supabase.auth.onAuthStateChange((event, session) => {
       this.signedIn.set(Boolean(session));
-      if (session) void this.loadOrders();
+      if (session) { void this.loadOrders(); void this.loadSpecial(); }
       if (event === 'PASSWORD_RECOVERY') this.recoveryMode.set(true);
     });
   }
@@ -77,7 +82,7 @@ export class Admin {
     this.ordersLoading.set(true);
     const { data, error } = await this.supabase
       .from('orders')
-      .select('id,customer_name,customer_email,customer_phone,requested_date,notes,subtotal_in_cents,status,paid_at,pickup_time_confirmed,address_released_at,order_items(product_title,quantity,unit_price_in_cents)')
+      .select('id,customer_name,customer_email,customer_phone,requested_date,notes,subtotal_in_cents,payment_method,stripe_invoice_id,status,paid_at,pickup_time_confirmed,address_released_at,order_items(product_title,quantity,unit_price_in_cents)')
       .order('created_at', { ascending: false })
       .limit(100);
     this.ordersLoading.set(false);
@@ -86,6 +91,44 @@ export class Admin {
       return;
     }
     this.orders.set((data ?? []) as AdminOrder[]);
+  }
+
+  protected async loadSpecial(): Promise<void> {
+    const { data } = await this.supabase.from('specials').select('title,qualifying_quantity,qualifying_unit_price_in_cents,bundle_price_in_cents,is_active').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+    this.special.set((data as Special | null) ?? null);
+  }
+
+  protected async saveSpecial(event: SubmitEvent): Promise<void> {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const { data: sessionData } = await this.supabase.auth.getSession();
+    if (!sessionData.session) { this.message.set('Sign in again before changing a special.'); return; }
+    this.specialSaving.set(true);
+    const response = await fetch('/api/manage-special', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData.session.access_token}` },
+      body: JSON.stringify({ title: String(data.get('title')).trim(), quantity: Number(data.get('quantity')), unitPriceInCents: Math.round(Number(data.get('unitPrice')) * 100), bundlePriceInCents: Math.round(Number(data.get('bundlePrice')) * 100), isActive: data.get('isActive') === 'true' }),
+    });
+    const result = await response.json() as { error?: string };
+    this.specialSaving.set(false);
+    if (!response.ok) { this.message.set(result.error ?? 'The special could not be saved.'); return; }
+    await this.loadSpecial();
+    this.message.set(data.get('isActive') === 'true' ? 'The special is live on the website and its matching Stripe price was created.' : 'The special is off. Customers now pay the regular product prices.');
+  }
+
+  protected async markCashPaid(order: AdminOrder): Promise<void> {
+    if (!confirm(`Confirm that $${(order.subtotal_in_cents / 100).toFixed(2)} cash was received from ${order.customer_name}?`)) return;
+    const { data } = await this.supabase.auth.getSession();
+    if (!data.session) { this.message.set('Sign in again before recording cash.'); return; }
+    const response = await fetch('/api/mark-cash-paid', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data.session.access_token}` },
+      body: JSON.stringify({ orderId: order.id }),
+    });
+    const result = await response.json() as { error?: string };
+    if (!response.ok) { this.message.set(result.error ?? 'The cash payment could not be recorded.'); return; }
+    this.message.set('Cash received. The order is paid, Stripe recorded it as an out-of-band cash sale, and the pickup address was released.');
+    await this.loadOrders();
   }
 
   protected async requestPasswordReset(form: HTMLFormElement): Promise<void> {
