@@ -151,6 +151,6 @@ export class PointOfSale {
 
   private async loadSpecial(): Promise<void> {
     const { data } = await this.supabase.from('specials').select('id,title,qualifying_quantity,qualifying_unit_price_in_cents,bundle_price_in_cents').eq('is_active', true).maybeSingle();
-    if (data) this.special.set(data as Special);
+    this.special.set((data as Special | null) ?? null);
   }
 }

@@ -18,17 +18,25 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const stripeKey = process.env['STRIPE_SECRET_KEY'];
-    if (!stripeKey) throw new Error('Stripe is not configured.');
-    const stripe = new Stripe(stripeKey);
+    const stripe = stripeKey ? new Stripe(stripeKey) : null;
     const { data: current } = await admin.supabase.from('specials').select('*').eq('is_active', true).maybeSingle();
     if (!isActive) {
-      if (current?.stripe_price_id) await stripe.prices.update(current.stripe_price_id, { active: false });
       const { data: saved, error } = current
         ? await admin.supabase.from('specials').update({ title, qualifying_quantity: quantity, qualifying_unit_price_in_cents: unitPriceInCents, bundle_price_in_cents: bundlePriceInCents, is_active: false, updated_at: new Date().toISOString() }).eq('id', current.id).select().single()
         : await admin.supabase.from('specials').insert({ title, qualifying_quantity: quantity, qualifying_unit_price_in_cents: unitPriceInCents, bundle_price_in_cents: bundlePriceInCents, is_active: false }).select().single();
       if (error) throw error;
-      return json({ special: saved });
+      let stripePriceDeactivated = true;
+      if (current?.stripe_price_id && stripe) {
+        try {
+          await stripe.prices.update(current.stripe_price_id, { active: false });
+        } catch (error) {
+          stripePriceDeactivated = false;
+          console.warn('Special was disabled in the shop, but its unused Stripe price could not be archived.', error instanceof Error ? error.message : 'Unknown error');
+        }
+      }
+      return json({ special: saved, stripePriceDeactivated });
     }
+    if (!stripe) throw new Error('Stripe is not configured.');
     let productId = current?.stripe_product_id as string | undefined;
     if (!productId) {
       const product = await stripe.products.create({ name: 'Mathias Treats specials', metadata: { site: 'mathias-treats' } });
