@@ -79,7 +79,7 @@
       @if (bundleSavingsInCents() > 0) {
         <p class="cart-note"><strong>You saved {{ bundleSavingsInCents() / 100 | currency }}</strong> with the 4-for-$10 offer.</p>
       }
-      <p class="cart-note">Pickup timing, final availability, and payment are confirmed by an adult after your request.</p>
+      <p class="cart-note">Pay securely with Stripe. Pickup timing and final availability are confirmed by an adult.</p>
       <button class="checkout-button" type="button" (click)="openCheckout()" [disabled]="itemCount() === 0">
         Continue to checkout <span aria-hidden="true">→</span>
       </button>
@@ -130,9 +130,9 @@
           <pre>{{ orderSummary() }}</pre>
         </div>
 
-        <p id="checkout-privacy" class="checkout-privacy">This is an order request, not a completed purchase. Do not include payment details or a home address. An adult will contact you to confirm the order.</p>
+        <p id="checkout-privacy" class="checkout-privacy">You will continue to Stripe’s secure payment page. Do not enter payment details in the notes. An adult will confirm pickup details.</p>
         <button class="checkout-button" type="submit" [disabled]="orderStatus() === 'sending'">
-          {{ orderStatus() === 'sending' ? 'Sending request…' : 'Send order request' }}
+          {{ orderStatus() === 'sending' ? 'Opening secure checkout…' : 'Pay securely with Stripe' }}
         </button>
         @if (orderMessage()) {
           <p class="order-status" [class.order-status-error]="orderStatus() === 'error'" role="status">{{ orderMessage() }}</p>

@@ -98,20 +98,26 @@ export class PointOfSale {
     const formData = new FormData(form);
 
     try {
-      const { error } = await this.supabase.rpc('place_order', {
+      const { data: orderId, error } = await this.supabase.rpc('place_order', {
         customer: { name: String(formData.get('name')), email: String(formData.get('email')), phone: String(formData.get('phone') ?? ''), requested_date: String(formData.get('requestedDate') ?? ''), notes: String(formData.get('notes') ?? '') },
         items: this.cartLines().map((line) => ({ product_id: line.product.id, quantity: line.quantity })),
       });
       if (error) throw error;
 
+      const checkoutResponse = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
+      const checkout = await checkoutResponse.json() as { url?: string; error?: string };
+      if (!checkoutResponse.ok || !checkout.url) throw new Error(checkout.error ?? 'Checkout unavailable');
+
       form.reset();
       this.quantities.set({});
-      this.checkoutOpen.set(false);
-      this.orderStatus.set('success');
-      this.orderMessage.set('Your order request was sent! An adult will email you to confirm availability, pickup, and payment.');
+      window.location.assign(checkout.url);
     } catch {
       this.orderStatus.set('error');
-      this.orderMessage.set('We could not send your order request. Your cart is still here—please wait a moment and try again.');
+      this.orderMessage.set('Secure checkout is temporarily unavailable. No payment was taken and your cart is still here—please try again.');
     }
   }
 

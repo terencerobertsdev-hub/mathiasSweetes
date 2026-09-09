@@ -8,6 +8,8 @@
 - Production branch: `main`
 - Database and authentication: Supabase project `sjkpanrzowucmxsvhdip`
 - Stripe account displayed during setup: `FinixTechnocrats`
+- Stripe single-treat product: `prod_VE0qImge3Uf4Af` / `price_1UDYpEHSSkrw4MjNwflBuWWS`
+- Stripe four-treat product: `prod_VE0rL732CvEE8C` / `price_1UDYphHSSkrw4MjNQkhoiT7A`
 
 Do not store passwords, full bank details, Stripe secret keys, webhook secrets, customer records, or card information in this repository.
 
@@ -53,9 +55,11 @@ The payout bank has not yet been verified for Mathias Treats. Verify the Stripe 
 - [x] Server-side order-price recalculation
 - [x] Administrator authentication and row-level security
 - [x] Product-image storage policies
-- [ ] Stripe Mathias Treats products and prices created
-- [ ] Server-side Stripe Checkout endpoint connected
-- [ ] Signed, idempotent Stripe webhook connected
+- [x] Stripe Mathias Treats products and prices created
+- [x] Server-side Stripe Checkout endpoint implemented
+- [x] Signed, idempotent Stripe webhook implemented
+- [ ] Stripe and Supabase server secrets added to Vercel
+- [ ] Production Stripe webhook endpoint registered
 - [ ] Payout destination verified by the business owner
 - [ ] Stripe test-mode purchase and refund completed
 - [ ] Live payment confirmation completed with explicit authorization
