@@ -26,8 +26,9 @@ Do not store passwords, full bank details, Stripe secret keys, webhook secrets, 
 - Public pickup area: Canton, Georgia. Never publish the home street address on the storefront or payment receipt.
 - The customer must acknowledge local pickup before the order can be saved.
 - The customer may pick up personally or arrange a delivery service to collect the order.
-- The Stripe invoice states that the exact address is provided separately after payment and adult confirmation.
-- An adult administrator must confirm the pickup time before privately releasing the exact address to the customer or delivery service.
+- The Stripe paid receipt/invoice contains the exact pickup address; it is not shown before payment.
+- The verified payment webhook records when the address was released.
+- Paid orders are placed in the outside pickup cart and labeled with the customer name.
 
 ## Adding or changing website products
 

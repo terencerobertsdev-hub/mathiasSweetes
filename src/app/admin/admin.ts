@@ -88,32 +88,6 @@ export class Admin {
     this.orders.set((data ?? []) as AdminOrder[]);
   }
 
-  protected async approvePickup(order: AdminOrder, input: HTMLInputElement): Promise<void> {
-    const pickupTime = input.value.trim();
-    if (!pickupTime) {
-      this.message.set('Enter and confirm a pickup date and time before releasing the address.');
-      input.focus();
-      return;
-    }
-    const { data } = await this.supabase.auth.getSession();
-    if (!data.session) {
-      this.message.set('Your administrator session expired. Sign in again.');
-      return;
-    }
-    const response = await fetch('/api/approve-pickup', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${data.session.access_token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId: order.id, pickupTime }),
-    });
-    const result = await response.json() as { approved?: boolean; error?: string };
-    if (!response.ok || !result.approved) {
-      this.message.set(result.error ?? 'Pickup approval failed. The address was not released.');
-      return;
-    }
-    this.message.set(`Pickup approved for order ${order.id.slice(0, 8)}. The customer was emailed privately and the release was logged.`);
-    await this.loadOrders();
-  }
-
   protected async requestPasswordReset(form: HTMLFormElement): Promise<void> {
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     if (!email) {

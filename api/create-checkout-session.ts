@@ -77,7 +77,7 @@ export async function POST(request: Request): Promise<Response> {
         enabled: true,
         invoice_data: {
           description: `Mathias Treats local pickup order ${order.id}`,
-          footer: 'Local pickup in Canton, Georgia. The exact address is provided separately after payment and adult confirmation of the pickup time.',
+          footer: 'PAID ORDER PICKUP: 113 McWhiter Pl, Canton, GA 30115. Your order will be in the outside pickup cart and labeled with the customer name. If using a delivery service, provide these details directly to the driver.',
           metadata: { site: 'mathias-treats', order_id: order.id },
         },
       },

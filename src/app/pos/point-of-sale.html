@@ -132,10 +132,10 @@
 
         <label class="pickup-agreement" for="pos-pickup-acknowledged">
           <input id="pos-pickup-acknowledged" name="pickupAcknowledged" type="checkbox" value="true" required />
-          <span><strong>I understand this is a local pickup order in Canton, Georgia.</strong> I will pick up the order or arrange for a delivery service to collect it. The exact address is provided after payment and adult confirmation of the pickup time.</span>
+          <span><strong>I understand this is a local pickup order in Canton, Georgia.</strong> I will pick up the labeled order from the outside pickup cart or arrange for a delivery service to collect it. The exact address is released only after payment.</span>
         </label>
 
-        <p id="checkout-privacy" class="checkout-privacy">You will continue to Stripe’s secure payment page. Do not enter payment details in the notes. An adult will confirm pickup details.</p>
+        <p id="checkout-privacy" class="checkout-privacy">You will continue to Stripe’s secure payment page. Do not enter payment details in the notes. Your paid receipt includes the private pickup address.</p>
         <button class="checkout-button" type="submit" [disabled]="orderStatus() === 'sending'">
           {{ orderStatus() === 'sending' ? 'Opening secure checkout…' : 'Pay securely with Stripe' }}
         </button>

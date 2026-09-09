@@ -16,12 +16,9 @@ h2 { font-size: 2rem; }
 .orders-panel th, .orders-panel td { padding: .8rem; border-bottom: 1px solid #e8e0ef; text-align: left; vertical-align: top; }
 .orders-panel th { color: var(--purple-900); }
 .orders-panel td small { display: block; margin-top: .25rem; color: var(--muted); }
-.orders-panel td label { display: block; margin-bottom: .35rem; font-size: .78rem; font-weight: 800; }
-.orders-panel td input { min-height: 42px; padding: .45rem; border: 2px solid #d8cde6; border-radius: .5rem; font: inherit; }
 .order-status { display: inline-block; padding: .25rem .5rem; border-radius: 999px; background: #eee; font-weight: 800; text-transform: capitalize; }
 .order-status.paid, .released { color: #12633f; background: #dff8eb; }
 .released { display: inline-block; padding: .25rem .5rem; border-radius: 999px; }
-.approve-button { display: block; margin-top: .5rem; padding: .55rem .75rem; border: 0; border-radius: .6rem; background: var(--purple-700); color: #fff; cursor: pointer; font-weight: 800; }
 .admin-layout { display: grid; grid-template-columns: minmax(300px, .8fr) minmax(0, 1.2fr); align-items: start; gap: 1.5rem; }
 .product-editor, .product-list { padding: 1.5rem; border-radius: 1.4rem; background: #fff; box-shadow: 0 14px 36px rgba(53,16,96,.1); }
 .product-editor { display: grid; gap: .55rem; }

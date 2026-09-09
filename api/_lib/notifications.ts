@@ -19,8 +19,8 @@ function orderText(order: OrderNotice): string {
     `Phone: ${order.customer_phone || 'Not provided'}`,
     `Total: $${(order.subtotal_in_cents / 100).toFixed(2)}`,
     `Requested pickup: ${order.requested_date || 'Not requested'}`,
-    'The private pickup address has not been released.',
-    'An adult administrator must approve the pickup in Admin > Orders.',
+    'The paid customer received the private pickup address on the Stripe receipt.',
+    'Prepare the order in the outside pickup cart with the customer name clearly labeled.',
   ].join('\n');
 }
 
@@ -66,21 +66,4 @@ export async function notifyPaidOrder(order: OrderNotice): Promise<void> {
   for (const result of results) {
     if (result.status === 'rejected') console.error('Paid-order notification error', result.reason instanceof Error ? result.reason.message : 'Unknown error');
   }
-}
-
-export async function sendPickupAddress(order: OrderNotice, pickupTime: string): Promise<void> {
-  const address = process.env['PICKUP_ADDRESS'];
-  const key = process.env['RESEND_API_KEY'];
-  if (!address || !key) throw new Error('Pickup email is not configured.');
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env['ORDER_NOTIFICATION_FROM_EMAIL'] ?? 'Mathias Treats <onboarding@resend.dev>',
-      to: [order.customer_email],
-      subject: `Pickup confirmed for Mathias Treats order ${order.id.slice(0, 8)}`,
-      text: `Your paid Mathias Treats order is confirmed for pickup.\n\nPickup time: ${pickupTime}\nPickup address: ${address}\n\nPlease arrive only at the confirmed time. If using a delivery service, provide these details directly to your driver.`,
-    }),
-  });
-  if (!response.ok) throw new Error(`Pickup email failed with HTTP ${response.status}`);
 }

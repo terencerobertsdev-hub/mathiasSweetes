@@ -45,10 +45,10 @@
 
   <section class="orders-panel" aria-labelledby="orders-heading">
     <div class="list-heading">
-      <div><p class="eyebrow">Adult fulfillment approval</p><h2 id="orders-heading">Orders</h2></div>
+      <div><p class="eyebrow">Paid pickup fulfillment</p><h2 id="orders-heading">Orders</h2></div>
       <button class="text-button" type="button" (click)="loadOrders()">Refresh orders</button>
     </div>
-    <p class="orders-guidance">The home address stays private until a paid order has a confirmed pickup time. Approving an order emails the address privately and records which administrator released it.</p>
+    <p class="orders-guidance">The address stays private until Stripe confirms payment. Paid customers receive it on their receipt, and the release is recorded automatically.</p>
     @if (ordersLoading()) {
       <p role="status">Loading orders…</p>
     } @else if (orders().length === 0) {
@@ -56,7 +56,7 @@
     } @else {
       <div class="orders-table-wrap">
         <table>
-          <thead><tr><th>Order details</th><th>Customer</th><th>Total</th><th>Status</th><th>Pickup authorization</th></tr></thead>
+          <thead><tr><th>Order details</th><th>Customer</th><th>Total</th><th>Status</th><th>Pickup</th></tr></thead>
           <tbody>
             @for (order of orders(); track order.id) {
               <tr>
@@ -72,12 +72,9 @@
                 <td><span class="order-status" [class.paid]="order.status === 'paid'">{{ order.status }}</span></td>
                 <td>
                   @if (order.address_released_at) {
-                    <strong class="released">Address released</strong><small>{{ order.pickup_time_confirmed }}</small>
+                    <strong class="released">Address released after payment</strong><small>Requested: {{ order.requested_date }}</small>
                   } @else if (order.status === 'paid') {
-                    <small>Requested: {{ order.requested_date || 'Not supplied' }}</small>
-                    <label [for]="'pickup-time-' + order.id">Confirmed pickup date and time</label>
-                    <input #pickupTime [id]="'pickup-time-' + order.id" type="datetime-local" required />
-                    <button class="approve-button" type="button" (click)="approvePickup(order, pickupTime)">Approve pickup &amp; release address</button>
+                    <span>Processing paid receipt</span>
                   } @else {
                     <span>Waiting for payment</span>
                   }
