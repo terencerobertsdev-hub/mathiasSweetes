@@ -91,6 +91,10 @@
   .cart-panel { position: static; }
 }
 
+@media (min-width: 901px) and (max-width: 93.999rem) {
+  .pos-section { width: calc(100% - 12rem); margin-left: 1rem; margin-right: auto; }
+}
+
 @media (max-width: 720px) {
   .pos-heading { align-items: start; flex-direction: column; }
   .product-grid { grid-template-columns: 1fr; }

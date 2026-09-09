@@ -63,6 +63,9 @@ h2 { font-size: 2rem; }
   .special-form { grid-template-columns: 1fr; }
   .admin-layout { grid-template-columns: 1fr; }
 }
+@media (min-width: 901px) and (max-width: 93.999rem) {
+  :host { width: calc(100% - 12rem); margin-left: 1rem; margin-right: auto; }
+}
 @media (max-width: 600px) {
   .admin-heading, .list-heading { align-items: start; flex-direction: column; }
   .field-row { grid-template-columns: 1fr; }
