@@ -70,6 +70,17 @@ export async function POST(request: Request): Promise<Response> {
       cancel_url: `${SITE_URL}/shop?payment=cancelled`,
       metadata: { site: 'mathias-treats', order_id: order.id },
       payment_intent_data: { metadata: { site: 'mathias-treats', order_id: order.id } },
+      custom_text: {
+        submit: { message: 'Local pickup in Canton, Georgia. The exact address is provided after payment and adult confirmation of the pickup time.' },
+      },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Mathias Treats local pickup order ${order.id}`,
+          footer: 'Local pickup in Canton, Georgia. The exact address is provided separately after payment and adult confirmation of the pickup time.',
+          metadata: { site: 'mathias-treats', order_id: order.id },
+        },
+      },
       submit_type: 'pay',
     }, { idempotencyKey: `mathias-order-${order.id}` });
 

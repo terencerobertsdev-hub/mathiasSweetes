@@ -20,6 +20,15 @@ Do not store passwords, full bank details, Stripe secret keys, webhook secrets, 
 - The storefront displays the discount automatically.
 - PostgreSQL recalculates the same discount when saving an order, so a browser cannot submit a forged total.
 
+## Fulfillment
+
+- All website orders are local pickup orders.
+- Public pickup area: Canton, Georgia. Never publish the home street address on the storefront or payment receipt.
+- The customer must acknowledge local pickup before the order can be saved.
+- The customer may pick up personally or arrange a delivery service to collect the order.
+- The Stripe invoice states that the exact address is provided separately after payment and adult confirmation.
+- An adult administrator must confirm the pickup time before privately releasing the exact address to the customer or delivery service.
+
 ## Adding or changing website products
 
 1. Sign in at `https://mathiastreats.com/admin` with an approved administrator account.
