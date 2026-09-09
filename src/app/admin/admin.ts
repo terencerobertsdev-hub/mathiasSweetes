@@ -20,7 +20,6 @@ type AdminOrder = {
   address_released_at: string | null;
   order_items: { product_title: string; quantity: number; unit_price_in_cents: number }[];
 };
-
 @Component({
   selector: 'app-admin',
   imports: [CurrencyPipe],
