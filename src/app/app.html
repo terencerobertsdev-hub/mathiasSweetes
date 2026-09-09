@@ -10,8 +10,9 @@
     <a href="/shop">Place an order</a>
     <a href="/#story">Our story</a>
     <a href="/#reviews">Reviews</a>
+    <a href="/#newsletter">Weekly updates</a>
+    <a href="/admin">Log in</a>
     <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-    <a href="/admin">Admin</a>
   </nav>
 </header>
 
@@ -136,6 +137,29 @@
       @if (orderMessage()) {
         <p class="form-status" [class.form-status-error]="orderStatus() === 'error'" role="status">{{ orderMessage() }}</p>
       }
+    </form>
+  </section>
+
+  <section class="newsletter section" id="newsletter" aria-labelledby="newsletter-heading">
+    <div>
+      <p class="eyebrow">Fresh from the kitchen</p>
+      <h2 id="newsletter-heading">Get the weekly treat list</h2>
+      <p>Join for cake-pop news, this week’s flavors, pop-up announcements, and availability. Email is required; a phone number is optional.</p>
+    </div>
+    <form class="newsletter-form" (submit)="subscribeToNewsletter($event)" aria-describedby="newsletter-privacy">
+      <label for="newsletter-name">Name</label>
+      <input id="newsletter-name" name="name" type="text" autocomplete="name" required maxlength="80" />
+      <label for="newsletter-email">Email</label>
+      <input id="newsletter-email" name="email" type="email" autocomplete="email" required maxlength="254" />
+      <label for="newsletter-phone">Phone <span>(optional)</span></label>
+      <input id="newsletter-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" />
+      <label class="sms-consent" for="newsletter-sms-consent">
+        <input id="newsletter-sms-consent" name="smsConsent" type="checkbox" value="true" />
+        <span>Yes, text me occasional Mathias Treats updates. Message and data rates may apply. Reply STOP to unsubscribe.</span>
+      </label>
+      <p id="newsletter-privacy" class="form-privacy">We use this information only for Mathias Treats updates. You can unsubscribe at any time.</p>
+      <button class="button button-primary" type="submit" [disabled]="newsletterStatus() === 'sending'">{{ newsletterStatus() === 'sending' ? 'Joining…' : 'Join the treat list' }}</button>
+      @if (newsletterMessage()) { <p class="form-status" [class.form-status-error]="newsletterStatus() === 'error'" role="status">{{ newsletterMessage() }}</p> }
     </form>
   </section>
 

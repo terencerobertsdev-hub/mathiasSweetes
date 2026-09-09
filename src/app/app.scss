@@ -78,6 +78,15 @@ h1 span::after { content: ''; position: absolute; left: 1%; right: 0; bottom: .1
 .order-form textarea { resize: vertical; }
 .order-form input:focus, .order-form textarea:focus { border-color: var(--purple-700); outline: 3px solid rgba(98,223,220,.45); outline-offset: 2px; }
 .form-privacy { margin: .75rem 0; color: var(--muted); font-size: .84rem; }
+.newsletter { display: grid; grid-template-columns: minmax(0, .85fr) minmax(300px, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; background: var(--surface); }
+.newsletter h2 { margin-top: 0; color: var(--purple-900); font-family: var(--font-display); font-size: clamp(2.4rem, 5vw, 4.4rem); line-height: 1; }
+.newsletter > div > p:last-child { color: var(--muted); line-height: 1.7; }
+.newsletter-form { display: grid; gap: .55rem; padding: 1.5rem; border-radius: 1.4rem; background: #fff; box-shadow: 0 14px 36px rgba(53,16,96,.1); }
+.newsletter-form label { margin-top: .45rem; color: var(--purple-900); font-weight: 800; }
+.newsletter-form label span { color: var(--muted); font-weight: 600; }
+.newsletter-form > input { width: 100%; padding: .8rem .9rem; border: 2px solid #d8cde6; border-radius: .65rem; font: inherit; }
+.newsletter-form .sms-consent { display: grid; grid-template-columns: auto 1fr; gap: .7rem; align-items: start; padding: .8rem; border-radius: .7rem; background: #edfffe; font-size: .84rem; }
+.newsletter-form .sms-consent input { width: 1.15rem; height: 1.15rem; margin-top: .15rem; accent-color: var(--purple-700); }
 .form-status { margin: .75rem 0 0; padding: .8rem 1rem; border-radius: .7rem; background: #e3faf8; color: #174a46; font-weight: 700; }
 .form-status-error { background: #fff0f0; color: #852020; }
 .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
@@ -113,6 +122,7 @@ footer div a { font-weight: 700; }
 .whatsapp-float { position: fixed; right: max(1rem, calc((100vw - 82rem) / 2 + 1rem)); bottom: 1.2rem; z-index: 50; display: flex; align-items: center; gap: .55rem; padding: .78rem 1rem; border: 0; border-radius: 999px; background: #25d366; color: #102a1b; text-decoration: none; font: 800 1rem/1.2 inherit; box-shadow: 0 6px 0 #087d3e, 0 10px 30px rgba(0,0,0,.2); }
 
 @media (max-width: 900px) {
+  .newsletter { grid-template-columns: 1fr; }
   nav a:not(.nav-order) { display: none; }
   .hero, .story, .order-form-section, .reviews, .pop-up { grid-template-columns: 1fr; }
   .hero { padding-top: 4.5rem; }

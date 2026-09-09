@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { PointOfSale } from './pos/point-of-sale';
 import { Admin } from './admin/admin';
 import { GALLERY_ITEMS, INSTAGRAM_URL, WHATSAPP_URL } from './site-content';
+import { SupabaseService } from './supabase.service';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,7 @@ import { GALLERY_ITEMS, INSTAGRAM_URL, WHATSAPP_URL } from './site-content';
 export class App {
   private readonly orderEndpoint = 'https://formspree.io/f/mykovkdg';
   private readonly document = inject(DOCUMENT);
+  private readonly supabase = inject(SupabaseService).client;
 
   protected readonly isShopPage = this.document.location.pathname === '/shop';
   protected readonly isAdminPage = this.document.location.pathname.startsWith('/admin');
@@ -23,6 +25,35 @@ export class App {
   protected readonly currentYear = new Date().getFullYear();
   protected readonly orderStatus = signal<'idle' | 'sending' | 'success' | 'error'>('idle');
   protected readonly orderMessage = signal('');
+  protected readonly newsletterStatus = signal<'idle' | 'sending' | 'success' | 'error'>('idle');
+  protected readonly newsletterMessage = signal('');
+
+  protected async subscribeToNewsletter(event: SubmitEvent): Promise<void> {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const phone = String(data.get('phone') ?? '').trim();
+    const smsConsent = data.get('smsConsent') === 'true';
+    if (smsConsent && !phone) {
+      this.newsletterStatus.set('error');
+      this.newsletterMessage.set('Enter a phone number if you want text updates.');
+      return;
+    }
+    this.newsletterStatus.set('sending');
+    this.newsletterMessage.set('');
+    const { error } = await this.supabase.rpc('subscribe_to_newsletter', {
+      subscriber: { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), phone, sms_consent: smsConsent },
+    });
+    if (error) {
+      this.newsletterStatus.set('error');
+      this.newsletterMessage.set('We could not complete your signup. Please try again.');
+      return;
+    }
+    form.reset();
+    this.newsletterStatus.set('success');
+    this.newsletterMessage.set('You’re on the treat list! Watch your inbox for weekly flavors and updates.');
+  }
 
   protected async submitOrder(event: SubmitEvent): Promise<void> {
     event.preventDefault();

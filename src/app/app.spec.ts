@@ -18,6 +18,10 @@ describe('Mathias Treats site', () => {
     expect(element.querySelectorAll('a[href^="https://wa.me/16783573948"]').length).toBeGreaterThan(0);
     expect(element.querySelectorAll('a').length).toBeGreaterThan(0);
     expect(element.textContent).toContain('WhatsApp');
+    expect(element.querySelector('a[href="/admin"]')?.textContent).toContain('Log in');
+    expect(element.querySelector('#newsletter-email[required]')).not.toBeNull();
+    expect(element.querySelector('#newsletter-phone[required]')).toBeNull();
+    expect(element.querySelector('#newsletter-sms-consent:not([checked])')).not.toBeNull();
     expect(element.querySelector('form#order-form')).toBeNull();
     expect(element.querySelector('section#order-form form')).not.toBeNull();
     expect(element.textContent).toContain('parent or guardian');
@@ -96,13 +100,14 @@ describe('Mathias Treats site', () => {
     expect(element.textContent).toContain('Authorized staff only');
   });
 
-  it('keeps Admin as the final main-navigation item', () => {
+  it('keeps WhatsApp as the final main-navigation item', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const links = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('nav a'));
 
-    expect(links.at(-1)?.textContent?.trim()).toBe('Admin');
-    expect(links.at(-1)?.getAttribute('href')).toBe('/admin');
+    expect(links.at(-1)?.textContent?.trim()).toBe('WhatsApp');
+    expect(links.at(-2)?.textContent?.trim()).toBe('Log in');
+    expect(links.at(-2)?.getAttribute('href')).toBe('/admin');
   });
 
   it('confirms when an administrator password-reset email is accepted', async () => {
