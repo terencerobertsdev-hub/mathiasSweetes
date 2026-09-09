@@ -16,7 +16,7 @@ export class App {
   private readonly document = inject(DOCUMENT);
 
   protected readonly isShopPage = this.document.location.pathname === '/shop';
-  protected readonly isAdminPage = this.document.location.pathname === '/admin';
+  protected readonly isAdminPage = this.document.location.pathname.startsWith('/admin');
   protected readonly galleryItems = GALLERY_ITEMS;
   protected readonly instagramUrl = INSTAGRAM_URL;
   protected readonly whatsappUrl = WHATSAPP_URL;

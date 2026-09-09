@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 import { Admin } from './admin/admin';
 import { PointOfSale } from './pos/point-of-sale';
+import { SupabaseService } from './supabase.service';
 
 describe('Mathias Treats site', () => {
   beforeEach(async () => {
@@ -20,8 +21,13 @@ describe('Mathias Treats site', () => {
     expect(element.querySelector('form#order-form')).toBeNull();
     expect(element.querySelector('section#order-form form')).not.toBeNull();
     expect(element.textContent).toContain('parent or guardian');
+    expect(element.textContent).toContain('Place a custom order');
+    expect(element.textContent).toContain('standard treats and common flavors');
+    expect(element.querySelector('#order-form a[href="/shop"]')).not.toBeNull();
     expect(element.querySelector('a[href="https://fawaii-custom-cookies.com/"]')).not.toBeNull();
     expect(element.querySelector('.fawaii-support img')?.getAttribute('alt')).toBe('Fawaii logo');
+    expect(element.textContent).toContain('Website crafted by');
+    expect(element.querySelector('footer a[href="https://canton-digital-works.com/"]')).not.toBeNull();
   });
 
   it('provides useful alternative text for displayed content images', () => {
@@ -80,5 +86,32 @@ describe('Mathias Treats site', () => {
     expect(element.querySelector('input[type="password"][autocomplete="current-password"]')).not.toBeNull();
     expect(element.querySelector('form#product-editor')).toBeNull();
     expect(element.textContent).toContain('Authorized staff only');
+  });
+
+  it('keeps Admin as the final main-navigation item', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    const links = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('nav a'));
+
+    expect(links.at(-1)?.textContent?.trim()).toBe('Admin');
+    expect(links.at(-1)?.getAttribute('href')).toBe('/admin');
+  });
+
+  it('confirms when an administrator password-reset email is accepted', async () => {
+    const supabase = TestBed.inject(SupabaseService).client;
+    const reset = vi.spyOn(supabase.auth, 'resetPasswordForEmail').mockResolvedValue({ data: {}, error: null });
+    const fixture = TestBed.createComponent(Admin);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    const email = element.querySelector('#admin-email') as HTMLInputElement;
+    const resetButton = Array.from(element.querySelectorAll('button')).find((button) => button.textContent?.includes('Forgot')) as HTMLButtonElement;
+
+    email.value = 'admin@example.com';
+    resetButton.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(reset).toHaveBeenCalledWith('admin@example.com', { redirectTo: 'https://mathiastreats.com/admin/reset-password' });
+    expect(element.textContent).toContain('Password-reset email sent to admin@example.com');
   });
 });

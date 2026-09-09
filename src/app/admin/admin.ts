@@ -1,8 +1,10 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Product } from '../pos/product.model';
 import { ProductRepository } from '../pos/product-repository.service';
 import { SupabaseService } from '../supabase.service';
+
+const ADMIN_RECOVERY_URL = 'https://mathiastreats.com/admin/reset-password';
 
 @Component({
   selector: 'app-admin',
@@ -14,13 +16,19 @@ import { SupabaseService } from '../supabase.service';
 export class Admin {
   private readonly productRepository = inject(ProductRepository);
   private readonly supabase = inject(SupabaseService).client;
+  private readonly document = inject(DOCUMENT);
 
   protected readonly products = this.productRepository.getProducts();
   protected readonly editingId = signal<number | null>(null);
   protected readonly imagePreview = signal('');
-  protected readonly message = signal('');
+  protected readonly message = signal(
+    new URLSearchParams(this.document.location.search).get('password') === 'changed'
+      ? 'Your password has been changed. Sign in with your new password.'
+      : '',
+  );
   protected readonly signedIn = signal(false);
-  protected readonly recoveryMode = signal(false);
+  protected readonly recoveryMode = signal(this.document.location.pathname === '/admin/reset-password');
+  protected readonly passwordResetStatus = signal<'idle' | 'sending'>('idle');
   private selectedImage: File | null = null;
 
   constructor() {
@@ -51,19 +59,48 @@ export class Admin {
       this.message.set('Enter your administrator email first.');
       return;
     }
-    const { error } = await this.supabase.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/admin` });
-    this.message.set(error ? 'The reset email could not be sent. Please try again.' : 'Check your email for a secure password-reset link.');
+
+    this.passwordResetStatus.set('sending');
+    this.message.set(`Sending a secure password-reset email to ${email}…`);
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, { redirectTo: ADMIN_RECOVERY_URL });
+    this.passwordResetStatus.set('idle');
+
+    if (error) {
+      const rateLimited = error.message.toLowerCase().includes('rate limit');
+      this.message.set(rateLimited
+        ? 'Too many reset emails were requested. Wait a few minutes, then try again.'
+        : 'The reset email could not be sent. Please try again.');
+      return;
+    }
+
+    this.message.set(`Password-reset email sent to ${email}. Check the inbox and spam folder, then use the secure link to choose a new password.`);
   }
 
   protected async updatePassword(event: SubmitEvent): Promise<void> {
     event.preventDefault();
     const form = event.currentTarget as HTMLFormElement;
     if (!form.reportValidity()) return;
-    const password = String(new FormData(form).get('newPassword'));
+    const data = new FormData(form);
+    const password = String(data.get('newPassword'));
+    const confirmation = String(data.get('confirmPassword'));
+    if (password !== confirmation) {
+      this.message.set('The passwords do not match. Enter the same password in both fields.');
+      return;
+    }
     const { error } = await this.supabase.auth.updateUser({ password });
-    this.message.set(error ? 'The password could not be changed. Try the reset link again.' : 'Your password has been changed.');
-    if (!error) this.recoveryMode.set(false);
+    if (error) {
+      this.message.set('The password could not be changed. Request a new reset link and try again.');
+      return;
+    }
+
     form.reset();
+    await this.supabase.auth.signOut();
+    this.document.location.assign('/admin?password=changed');
+  }
+
+  protected async cancelPasswordReset(): Promise<void> {
+    await this.supabase.auth.signOut();
+    this.document.location.assign('/admin');
   }
 
   protected editProduct(product: Product): void {

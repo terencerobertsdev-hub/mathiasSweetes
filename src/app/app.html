@@ -8,10 +8,10 @@
   <nav aria-label="Main navigation">
     <a href="/#treats">Treats</a>
     <a href="/shop">Place an order</a>
-    <a href="/admin">Admin</a>
     <a href="/#story">Our story</a>
     <a href="/#reviews">Reviews</a>
     <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <a href="/admin">Admin</a>
   </nav>
 </header>
 
@@ -86,9 +86,10 @@
 
   <section class="order-form-section section" id="order-form" aria-labelledby="order-form-heading">
     <div class="order-form-copy">
-      <p class="eyebrow">Adult-managed ordering</p>
-      <h2 id="order-form-heading">Tell us what you’d like</h2>
-      <p>Your request goes privately to Mathias’s parent or guardian. They will handle every reply, order detail, and pickup arrangement.</p>
+      <p class="eyebrow">Custom treats, made for you</p>
+      <h2 id="order-form-heading">Place a custom order</h2>
+      <p>Need special colors, flavors, decorations, quantities, or treats for an event? Send a custom order request here. Your request goes privately to Mathias’s parent or guardian, who will confirm the details, availability, price, and pickup arrangements.</p>
+      <p>Looking for our standard treats and common flavors that we make regularly? <a class="text-link" href="/shop">Order available treats through our online shop <span aria-hidden="true">→</span></a></p>
       <div class="minor-safety-note">
         <strong>Protecting our young baker</strong>
         <p>Please do not submit information about a child, payment details, or a home address. An adult will confirm safe pickup details after reviewing your request.</p>
@@ -104,8 +105,8 @@
     </div>
 
     <form class="order-form" (submit)="submitOrder($event)" aria-describedby="order-form-privacy">
-      <input type="hidden" name="_subject" value="Mathias Treats order inquiry" />
-      <input type="hidden" name="source" value="Mathias Treats website" />
+      <input type="hidden" name="_subject" value="Mathias Treats custom order request" />
+      <input type="hidden" name="source" value="Mathias Treats custom order form" />
       <div class="honeypot" aria-hidden="true">
         <label for="company-website">Leave this field empty</label>
         <input id="company-website" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
@@ -120,12 +121,12 @@
       <label for="requested-date">When do you need the treats? <span>(optional)</span></label>
       <input id="requested-date" name="requestedDate" type="date" />
 
-      <label for="order-details">What would you like?</label>
-      <textarea id="order-details" name="orderDetails" rows="6" required minlength="10" maxlength="1500" placeholder="Tell us the treat type, quantity, colors, occasion, and timing."></textarea>
+      <label for="order-details">Describe your custom order</label>
+      <textarea id="order-details" name="orderDetails" rows="6" required minlength="10" maxlength="1500" placeholder="Tell us the treat type, flavor, quantity, colors, decorations, occasion, and timing."></textarea>
 
       <p id="order-form-privacy" class="form-privacy">This form is monitored by an adult. Your information is used only to respond to this order request.</p>
       <button class="button button-primary" type="submit" [disabled]="orderStatus() === 'sending'">
-        {{ orderStatus() === 'sending' ? 'Sending…' : 'Send order request' }}
+        {{ orderStatus() === 'sending' ? 'Sending…' : 'Send custom order request' }}
       </button>
 
       @if (orderMessage()) {
@@ -164,7 +165,7 @@
   <section class="final-cta">
     <img src="assets/brand/mathias-treats-logo.jpg" alt="Mathias Treats cakesicles, cake pops, and treats" width="180" height="180" loading="lazy" />
     <div><p class="eyebrow">Ready for something sweet?</p><h2>Let’s make your treat idea happen.</h2></div>
-    <a class="button button-yellow" href="#order-form">Request an order</a>
+    <a class="button button-yellow" href="#order-form">Place a custom order</a>
   </section>
   }
 </main>
@@ -173,7 +174,13 @@
   <a class="footer-brand" href="/">Mathias Treats</a>
   <p>Cakesicles · Cake pops · Treats</p>
   <div><a [href]="instagramUrl" target="_blank" rel="noopener noreferrer">Instagram</a><a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>
-  <small>© {{ currentYear }} Mathias Treats. Handmade with joy.</small>
+  <div class="footer-legal">
+    <small>© {{ currentYear }} Mathias Treats. Handmade with joy.</small>
+    <div class="site-credit">
+      <small>Website crafted by <a class="developer-link" href="https://canton-digital-works.com/" target="_blank" rel="noopener noreferrer">Canton Digital Works</a></small>
+      <a class="website-cta" href="https://canton-digital-works.com/" target="_blank" rel="noopener noreferrer">Need a website? Let’s build it <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
 </footer>
 
 <a class="whatsapp-float" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" aria-label="Contact Mathias Treats through parent-managed WhatsApp">
