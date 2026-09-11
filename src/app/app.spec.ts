@@ -115,6 +115,23 @@ describe('Mathias Treats site', () => {
     expect(links.at(-2)?.getAttribute('href')).toBe('/admin');
   });
 
+  it('provides an accessible collapsible mobile navigation', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    const menuButton = element.querySelector('.menu-toggle') as HTMLButtonElement;
+    const navigation = element.querySelector('#main-navigation') as HTMLElement;
+
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
+    expect(menuButton.getAttribute('aria-controls')).toBe('main-navigation');
+    menuButton.click();
+    fixture.detectChanges();
+    expect(menuButton.getAttribute('aria-expanded')).toBe('true');
+    expect(navigation.classList.contains('nav-open')).toBe(true);
+    expect(navigation.querySelectorAll('a').length).toBe(7);
+    expect(navigation.querySelector('a:last-child')?.getAttribute('href')).toContain('wa.me/16783573948');
+  });
+
   it('confirms when an administrator password-reset email is accepted', async () => {
     const supabase = TestBed.inject(SupabaseService).client;
     const reset = vi.spyOn(supabase.auth, 'resetPasswordForEmail').mockResolvedValue({ data: {}, error: null });

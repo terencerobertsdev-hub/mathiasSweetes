@@ -5,14 +5,18 @@
     <img src="assets/brand/mathias-treats-logo.jpg" alt="" width="60" height="60" />
     <span>Mathias Treats</span>
   </a>
-  <nav aria-label="Main navigation">
-    <a href="/#treats">Treats</a>
-    <a href="/shop">Place an order</a>
-    <a href="/#story">Our story</a>
-    <a href="/#reviews">Reviews</a>
-    <a href="/#newsletter">Weekly updates</a>
-    <a href="/admin">Log in</a>
-    <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+  <button class="menu-toggle" type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="mobileMenuOpen()" aria-controls="main-navigation">
+    <span class="menu-toggle-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>Menu</span>
+  </button>
+  <nav id="main-navigation" aria-label="Main navigation" [class.nav-open]="mobileMenuOpen()">
+    <a href="/#treats" (click)="closeMobileMenu()">Treats</a>
+    <a href="/shop" (click)="closeMobileMenu()">Place an order</a>
+    <a href="/#story" (click)="closeMobileMenu()">Our story</a>
+    <a href="/#reviews" (click)="closeMobileMenu()">Reviews</a>
+    <a href="/#newsletter" (click)="closeMobileMenu()">Weekly updates</a>
+    <a href="/admin" (click)="closeMobileMenu()">Log in</a>
+    <a class="nav-order" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" (click)="closeMobileMenu()">WhatsApp</a>
   </nav>
 </header>
 

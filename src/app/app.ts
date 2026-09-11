@@ -27,6 +27,15 @@ export class App {
   protected readonly orderMessage = signal('');
   protected readonly newsletterStatus = signal<'idle' | 'sending' | 'success' | 'error'>('idle');
   protected readonly newsletterMessage = signal('');
+  protected readonly mobileMenuOpen = signal(false);
+
+  protected toggleMobileMenu(): void {
+    this.mobileMenuOpen.update((open) => !open);
+  }
+
+  protected closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
 
   protected async subscribeToNewsletter(event: SubmitEvent): Promise<void> {
     event.preventDefault();
